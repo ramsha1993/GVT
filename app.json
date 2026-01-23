@@ -25,21 +25,7 @@
     "web": {
       "output": "static"
     },
-    "plugins": [
-      "expo-router",
-      [
-        "expo-splash-screen",
-        {
-          "image": "./assets/images/splash-bg.png",
-          "imageWidth": 1000,
-          "resizeMode": "cover",
-          "backgroundColor": "#F5F1E8",
-          "dark": {
-            "backgroundColor": "#F5F1E8"
-          }
-        }
-      ]
-    ],
+    "plugins": ["expo-router"],
     "experiments": {
       "typedRoutes": true,
       "reactCompiler": true

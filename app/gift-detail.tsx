@@ -5,6 +5,7 @@ import { LinearGradient } from "expo-linear-gradient";
 import { Stack } from "expo-router";
 import { Suspense, useEffect, useRef, useState } from "react";
 import {
+  ActivityIndicator,
   Dimensions,
   Image,
   SafeAreaView,
@@ -20,7 +21,7 @@ const { width } = Dimensions.get("window");
 
 function Model({ rotation }: { rotation: number }) {
   // @ts-ignore
-  const gltf = useGLTF(require("../assets/3dmodel/elephant_3d.glb"));
+  const gltf = useGLTF(require("../assets/3dmodel/elephant_3d.glb")) as any;
   const mesh = useRef<THREE.Group>(null);
 
   useFrame(() => {
@@ -54,6 +55,9 @@ export default function GiftDetail() {
       <ScrollView contentContainerStyle={styles.scrollContent}>
         {/* 3D Model Viewer Container */}
         <View style={styles.modelContainer}>
+          <View style={styles.loaderContainer}>
+            <ActivityIndicator size="large" color="#C98B5E" />
+          </View>
           <Canvas camera={{ position: [0, 0, 5], fov: 50 }} style={{ flex: 1 }}>
             <ambientLight intensity={7} />
             <Suspense fallback={null}>
@@ -192,6 +196,12 @@ const styles = StyleSheet.create({
     borderBottomRightRadius: 30,
     overflow: 'hidden', 
     marginBottom: 20,
+  },
+  loaderContainer: {
+    ...StyleSheet.absoluteFillObject,
+    justifyContent: 'center',
+    alignItems: 'center',
+    zIndex: -1,
   },
   controlsSection: {
     alignItems: "center",
