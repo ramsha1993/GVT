@@ -1,131 +1,173 @@
-import { Ionicons } from "@expo/vector-icons";
-import { Stack, useRouter } from "expo-router";
-import { useState } from "react";
+import Slider from "@react-native-community/slider";
+import { useGLTF } from "@react-three/drei/native";
+import { Canvas, useFrame } from "@react-three/fiber/native";
+import { LinearGradient } from "expo-linear-gradient";
+import { Stack } from "expo-router";
+import { Suspense, useEffect, useRef, useState } from "react";
 import {
+  Dimensions,
   Image,
   SafeAreaView,
   ScrollView,
   StyleSheet,
   Text,
-  TouchableOpacity,
   View,
 } from "react-native";
+import * as THREE from "three";
+import "../polyfills";
+
+const { width } = Dimensions.get("window");
+
+function Model({ rotation }: { rotation: number }) {
+  // @ts-ignore
+  const gltf = useGLTF(require("../assets/3dmodel/elephant_3d.glb"));
+  const mesh = useRef<THREE.Group>(null);
+
+  useFrame(() => {
+    if (mesh.current) {
+      mesh.current.rotation.y = rotation;
+    }
+  });
+
+  return (
+    <primitive 
+      object={gltf.scene} 
+      ref={mesh} 
+      scale={[2.8, 2.8, 2.8]} 
+      position={[0, -1.2, 0]} 
+    />
+  );
+}
 
 export default function GiftDetail() {
-  const router = useRouter();
-  const [currentImageIndex, setCurrentImageIndex] = useState(0);
+  const [rotation, setRotation] = useState(0);
+  const rotationRef = useRef(0);
+  const [mounted, setMounted] = useState(false);
 
-  // For now, using gift1.png as the main image
-  // In a real app, this would come from route params
-  const images = [
-    require("../assets/images/giftimg2.png"),
-    require("../assets/images/giftimg1.png"), // Duplicate for demo
-  ];
-
-  const handlePrevImage = () => {
-    setCurrentImageIndex((prev) => (prev === 0 ? images.length - 1 : prev - 1));
-  };
-
-  const handleNextImage = () => {
-    setCurrentImageIndex((prev) => (prev === images.length - 1 ? 0 : prev + 1));
-  };
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   return (
     <SafeAreaView style={styles.container}>
       <Stack.Screen options={{ headerShown: false }} />
       <ScrollView contentContainerStyle={styles.scrollContent}>
-        {/* Image Carousel Section */}
-        <View style={styles.imageSection}>
-          <View style={styles.imageContainer}>
-            {/* Left Arrow */}
-            <TouchableOpacity
-              style={[styles.arrowButton, styles.leftArrow]}
-              onPress={handlePrevImage}
-            >
-              <Ionicons name="chevron-back" size={24} color="#FFFFFF" />
-            </TouchableOpacity>
+        {/* 3D Model Viewer Container */}
+        <View style={styles.modelContainer}>
+          <Canvas camera={{ position: [0, 0, 5], fov: 50 }} style={{ flex: 1 }}>
+            <ambientLight intensity={7} />
+            <Suspense fallback={null}>
+              <Model rotation={rotation} />
+            </Suspense>
+          </Canvas>
+        </View>
 
-            {/* Gift Image */}
-            <Image
-              source={images[currentImageIndex]}
-              style={styles.giftImage}
-              resizeMode="contain"
-            />
+        {/* Rotation Slider */}
+        <View style={styles.controlsSection}>
+          <Slider
+            style={styles.slider}
+            minimumValue={0}
+            maximumValue={Math.PI * 2}
+            value={rotation}
+            onValueChange={setRotation}
+            minimumTrackTintColor="#BCA488" 
+            maximumTrackTintColor="#BCA488" 
+            thumbTintColor="#C98B5E" 
+          />
+          <Text style={styles.sliderText}>Slide to Rotate</Text>
+        </View>
 
-            {/* 360 Label */}
-            <Image
-              source={require("../assets/images/360.png")}
-              style={styles.label360}
-              resizeMode="contain"
-            />
-
-            {/* Right Arrow */}
-            <TouchableOpacity
-              style={[styles.arrowButton, styles.rightArrow]}
-              onPress={handleNextImage}
-            >
-              <Ionicons name="chevron-forward" size={24} color="#FFFFFF" />
-            </TouchableOpacity>
-          </View>
-
-          {/* Pagination Dots */}
-          <View style={styles.paginationContainer}>
-            {images.map((_, index) => (
-              <View
-                key={index}
-                style={[
-                  styles.dot,
-                  currentImageIndex === index && styles.activeDot,
-                ]}
-              />
-            ))}
-          </View>
+        {/* Title Section */}
+        <View style={styles.titleSection}>
+          <Text style={styles.titleItalic}>Hand Crafted</Text>
+          <Text style={styles.titleRegular}>Elephant Statue</Text>
+          <Text style={styles.description}>
+            A symbol of wisdom, strength, and prosperity, reflecting traditional craftsmanship and unity.
+          </Text>
         </View>
 
         {/* Content Section */}
         <View style={styles.contentSection}>
-          {/* Title */}
-          <View style={styles.titleContainer}>
-            <Text style={styles.titleItalic}>Hand Crafted </Text>
-            <Text style={styles.titleRegular}>Elephant Statue</Text>
-          </View>
-
-          {/* Main Description */}
-          <Text style={styles.mainDescription}>
-            A symbol of wisdom, strength, and prosperity, this handcrafted elephant statue
-            was presented to the Government of Abu Dhabi as a token of enduring friendship
-            and cultural appreciation. The intricate design reflects traditional artistry
-            and the spirit of unity between nations.
-          </Text>
-
-          {/* Gift Origin Section */}
-          <View style={styles.section}>
-            <Text style={styles.sectionTitle}>Gift Origin</Text>
-            <Text style={styles.sectionText}>
-              This statue was received from the Government of India during an official
-              diplomatic visit in 2018, symbolizing the shared values of peace, cultural harmony,
-              and respect for heritage.
+          
+          {/* Gift Origin */}
+          <LinearGradient
+            colors={['rgba(255, 255, 255, 0.5)', 'rgba(255, 245, 228, 0.5)']}
+            style={styles.infoCard}
+          >
+            <View style={styles.iconContainer}>
+              <Image
+                source={require("../assets/images/globe.png")}
+                style={styles.icon}
+                resizeMode="contain"
+              />
+            </View>
+            <Text style={styles.cardTitle}>Gift Origin</Text>
+            <Text style={styles.cardText}>
+              This statue was received from the Government of India during an official diplomatic visit in 2018, symbolizing the shared values of peace, cultural harmony, and respect between both nations.
             </Text>
-          </View>
+          </LinearGradient>
 
-          {/* Presentation Section */}
-          <View style={styles.section}>
-            <Text style={styles.sectionTitle}>Presentation</Text>
-            <Text style={styles.sectionText}>
-              The gift was formally presented during a state ceremony held at the Presidential
-              Palace, where leaders exchanged commemorative artifacts representing their
-              nations' heritage and mutual respect.
+          {/* Gift Presentation */}
+          <LinearGradient
+            colors={['rgba(255, 255, 255, 0.5)', 'rgba(255, 245, 228, 0.5)']}
+            style={styles.infoCard}
+          >
+            <View style={styles.iconContainer}>
+              <Image
+                source={require("../assets/images/wheat.png")}
+                style={styles.icon}
+                resizeMode="contain"
+              />
+            </View>
+            <Text style={styles.cardTitle}>Gift Presentation</Text>
+            <Text style={styles.cardText}>
+              Formally presented during a state ceremony at the Presidential Palace, where leaders exchanged artifacts representing heritage.
             </Text>
-          </View>
+          </LinearGradient>
 
-          {/* Material & Craftsmanship Section */}
-          <View style={styles.section}>
-            <Text style={styles.sectionTitle}>Material & Craftsmanship</Text>
-            <Text style={styles.sectionText}>
-              Hand-carved from marble and adorned with semi-precious stones and gold leaf
-              detailing, this piece showcases the precision and elegance of traditional Indian
-              artistry.
-            </Text>
+          {/* Material & Artistry */}
+          <LinearGradient
+            colors={['rgba(255, 255, 255, 0.5)', 'rgba(255, 245, 228, 0.5)']}
+            style={styles.infoCard}
+          >
+            <View style={styles.iconContainer}>
+              <Image
+                source={require("../assets/images/books.png")}
+                style={styles.icon}
+                resizeMode="contain"
+              />
+            </View>
+            <Text style={styles.cardTitle}>Material & Artistry</Text>
+            <View style={styles.materialRow}>
+              <View style={styles.materialColumn}>
+                <Text style={styles.materialLabel}>Material</Text>
+                <Text style={styles.materialValue}>White Marble</Text>
+              </View>
+              <View style={styles.materialColumn}>
+                <Text style={styles.materialLabel}>Finish</Text>
+                <Text style={styles.materialValue}>24K Gold</Text>
+              </View>
+            </View>
+          </LinearGradient>
+
+          {/* Technical Essence */}
+          <View style={styles.technicalSection}>
+            <Text style={styles.technicalTitle}>Technical Essence</Text>
+            
+            <View style={styles.technicalRow}>
+              <Text style={styles.technicalLabel}>Dimensions</Text>
+              <Text style={styles.technicalValue}>12"H x 15"W x 8"D</Text>
+            </View>
+            
+            <View style={styles.technicalRow}>
+              <Text style={styles.technicalLabel}>Weight</Text>
+              <Text style={styles.technicalValue}>4.2 kg</Text>
+            </View>
+            
+            <View style={styles.technicalRow}>
+              <Text style={styles.technicalLabel}>Authenticity</Text>
+              <Text style={styles.technicalValue}>Signed Certificate</Text>
+            </View>
           </View>
         </View>
       </ScrollView>
@@ -136,110 +178,155 @@ export default function GiftDetail() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#FFEDCF", // Main background
+    backgroundColor: "#FFF8E7", 
   },
   scrollContent: {
     flexGrow: 1,
+    paddingBottom: 40,
   },
-  imageSection: {
+  modelContainer: {
     backgroundColor: "#FFFFFF",
-    borderBottomLeftRadius: 40,
-    borderBottomRightRadius: 40,
-    paddingVertical: 40,
+    height: 400,
+    width: "100%",
+    borderBottomLeftRadius: 30,
+    borderBottomRightRadius: 30,
+    overflow: 'hidden', 
+    marginBottom: 20,
+  },
+  controlsSection: {
+    alignItems: "center",
     paddingHorizontal: 20,
     marginBottom: 20,
   },
-  imageContainer: {
-    position: "relative",
-    alignItems: "center",
-    justifyContent: "center",
-    height: 300,
-  },
-  giftImage: {
-    width: "100%",
-    height: "100%",
-  },
-  label360: {
-    position: "absolute",
-    bottom: 0,
-    alignSelf: "center",
-    width: 50,
-    height: 50,
-  },
-  arrowButton: {
-    position: "absolute",
-    width: 40,
+  slider: {
+    width: width - 40,
     height: 40,
-    borderRadius: 20,
-    backgroundColor: "#333333",
+  },
+  sliderText: {
+    fontFamily: "InstrumentSans",
+    fontSize: 14,
+    color: "#5A5A5A",
+    marginTop: 5,
+  },
+  titleSection: {
     alignItems: "center",
-    justifyContent: "center",
-    zIndex: 10,
-  },
-  leftArrow: {
-    left: 10,
-  },
-  rightArrow: {
-    right: 10,
-  },
-  paginationContainer: {
-    flexDirection: "row",
-    justifyContent: "center",
-    alignItems: "center",
-    marginTop: 20,
-    gap: 8,
-  },
-  dot: {
-    width: 8,
-    height: 8,
-    borderRadius: 4,
-    backgroundColor: "#D0D0D0",
-  },
-  activeDot: {
-    backgroundColor: "#333333",
-  },
-  contentSection: {
-    backgroundColor: "#FFF6E7",
-    paddingHorizontal: 40,
-    paddingVertical: 20,
-  },
-  titleContainer: {
-    flexDirection: "row",
-    flexWrap: "wrap",
-    marginBottom: 16,
+    paddingHorizontal: 30,
+    marginBottom: 30,
   },
   titleItalic: {
     fontFamily: "PlayfairDisplayItalic",
-    fontSize: 32,
-    color: "#1A1A1A",
+    fontSize: 40,
+    color: "#2A2A2A",
+    textAlign: "center",
   },
   titleRegular: {
     fontFamily: "InstrumentSans",
-    fontSize: 32,
-    color: "#1A1A1A",
+    fontSize: 36,
+    color: "#2A2A2A",
     fontWeight: "500",
+    textAlign: "center",
+    marginTop: -5,
   },
-  mainDescription: {
+  description: {
     fontFamily: "InstrumentSans",
     fontSize: 14,
-    color: "#4A4A4A",
+    color: "#5A5A5A",
+    textAlign: "center",
     lineHeight: 22,
-    marginBottom: 24,
+    marginTop: 15,
   },
-  section: {
-    marginBottom: 24,
+  contentSection: {
+    paddingHorizontal: 20,
   },
-  sectionTitle: {
+  infoCard: {
+    borderRadius: 20,
+    padding: 30,
+    marginBottom: 20,
+    alignItems: "center",
+    borderWidth: 1,
+    borderColor: 'rgba(255,255,255,0.6)',
+  },
+  iconContainer: {
+    width: 60,
+    height: 60,
+    marginBottom: 15,
+    borderRadius: 12,
+    borderWidth: 1,
+    borderColor: '#E6D5C4', 
+    backgroundColor: 'rgba(255,255,255,0.4)',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  icon: {
+    width: 32,
+    height: 32,
+    tintColor: '#C98B5E', 
+  },
+  cardTitle: {
     fontFamily: "InstrumentSans",
-    fontSize: 18,
+    fontSize: 22,
+    color: "#2A2A2A",
+    fontWeight: "600",
+    marginBottom: 10,
+    textAlign: "center",
+  },
+  cardText: {
+    fontFamily: "InstrumentSans",
+    fontSize: 15,
+    color: "#4A4A4A",
+    lineHeight: 24,
+    textAlign: "center",
+  },
+  materialRow: {
+    flexDirection: "row",
+    width: "100%",
+    justifyContent: "space-around",
+    marginTop: 15,
+  },
+  materialColumn: {
+    alignItems: "center",
+  },
+  materialLabel: {
+    fontFamily: "InstrumentSans",
+    fontSize: 14,
+    color: "#C98B5E",
+    fontWeight: "700",
+    marginBottom: 5,
+  },
+  materialValue: {
+    fontFamily: "InstrumentSans",
+    fontSize: 15,
+    color: "#2A2A2A",
+  },
+  technicalSection: {
+    marginTop: 20,
+    padding: 20,
+    backgroundColor: 'rgba(255,255,255,0.4)', 
+    borderRadius: 30,
+  },
+  technicalTitle: {
+    fontFamily: "PlayfairDisplayItalic",
+    fontSize: 32,
+    color: "#2A2A2A",
+    textAlign: "center",
+    marginBottom: 20,
+  },
+  technicalRow: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    paddingVertical: 15,
+    borderBottomWidth: 1,
+    borderBottomColor: "#D0C4A8",
+  },
+  technicalLabel: {
+    fontFamily: "InstrumentSans",
+    fontSize: 16,
+    color: "#888888",
+  },
+  technicalValue: {
+    fontFamily: "InstrumentSans",
+    fontSize: 16,
     color: "#1A1A1A",
-    fontWeight: "bold",
-    marginBottom: 8,
-  },
-  sectionText: {
-    fontFamily: "InstrumentSans",
-    fontSize: 14,
-    color: "#4A4A4A",
-    lineHeight: 22,
+    fontWeight: "700",
   },
 });
