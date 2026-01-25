@@ -74,7 +74,7 @@ export default function GiftDetail() {
             <Canvas 
               camera={{ position: [0, 0, 5], fov: 50 }} 
               style={{ flex: 1 }}
-              frameloop="demand" // Render only when necessary
+              frameloop="always" // Continuous rendering for slider interaction
             >
               <ambientLight intensity={7} />
               <directionalLight position={[5, 10, 5]} intensity={1.5} />
