@@ -1,6 +1,7 @@
 import Slider from "@react-native-community/slider";
 import { useGLTF } from "@react-three/drei/native";
 import { Canvas, useFrame } from "@react-three/fiber/native";
+import { Asset } from "expo-asset";
 import { LinearGradient } from "expo-linear-gradient";
 import { Stack } from "expo-router";
 import { Suspense, useEffect, useRef, useState } from "react";
@@ -19,9 +20,13 @@ import "../polyfills";
 
 const { width } = Dimensions.get("window");
 
+// Preload the asset to ensure it's available
+const modelAsset = Asset.fromModule(require("../assets/3dmodel/elephant_3d.glb"));
+
 function Model({ rotation }: { rotation: number }) {
+  // Use the local URI from the preloaded asset
   // @ts-ignore
-  const gltf = useGLTF(require("../assets/3dmodel/elephant_3d.glb")) as any;
+  const gltf = useGLTF(modelAsset.uri || modelAsset.localUri || require("../assets/3dmodel/elephant_3d.glb")) as any;
   const mesh = useRef<THREE.Group>(null);
 
   useFrame(() => {
@@ -42,11 +47,18 @@ function Model({ rotation }: { rotation: number }) {
 
 export default function GiftDetail() {
   const [rotation, setRotation] = useState(0);
-  const rotationRef = useRef(0);
-  const [mounted, setMounted] = useState(false);
+  const [assetLoaded, setAssetLoaded] = useState(false);
 
   useEffect(() => {
-    setMounted(true);
+    async function loadAsset() {
+      try {
+        await modelAsset.downloadAsync();
+        setAssetLoaded(true);
+      } catch (e) {
+        console.error("Failed to load 3D model asset:", e);
+      }
+    }
+    loadAsset();
   }, []);
 
   return (
@@ -58,12 +70,21 @@ export default function GiftDetail() {
           <View style={styles.loaderContainer}>
             <ActivityIndicator size="large" color="#C98B5E" />
           </View>
-          <Canvas camera={{ position: [0, 0, 5], fov: 50 }} style={{ flex: 1 }}>
-            <ambientLight intensity={7} />
-            <Suspense fallback={null}>
-              <Model rotation={rotation} />
-            </Suspense>
-          </Canvas>
+          {assetLoaded && (
+            <Canvas 
+              camera={{ position: [0, 0, 5], fov: 50 }} 
+              style={{ flex: 1 }}
+              frameloop="demand" // Render only when necessary
+            >
+              <ambientLight intensity={7} />
+              <directionalLight position={[5, 10, 5]} intensity={1.5} />
+              <directionalLight position={[-5, 5, 5]} intensity={1.0} />
+              <directionalLight position={[0, 0, 5]} intensity={1.0} />
+              <Suspense fallback={null}>
+                <Model rotation={rotation} />
+              </Suspense>
+            </Canvas>
+          )}
         </View>
 
         {/* Rotation Slider */}
