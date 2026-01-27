@@ -3,6 +3,7 @@ import { Stack } from 'expo-router';
 import { useState } from 'react';
 import { View } from 'react-native';
 import 'react-native-reanimated';
+import { ThemeProvider } from '../contexts/ThemeContext';
 import Splash from './splash';
 
 export default function RootLayout() {
@@ -19,15 +20,17 @@ export default function RootLayout() {
   }
 
   return (
-    <View style={{ flex: 1 }}>
-      {isSplashing && <Splash onFinish={() => setIsSplashing(false)} />}
-      <Stack>
-        <Stack.Screen name="index" options={{ headerShown: false }} />
-        <Stack.Screen name="login" options={{ headerShown: false }} />
-        <Stack.Screen name="signup" options={{ headerShown: false }} />
-        <Stack.Screen name="home" options={{ headerShown: false }} />
-        <Stack.Screen name="gift-detail" options={{ headerShown: false }} />
-      </Stack>
-    </View>
+    <ThemeProvider>
+      <View style={{ flex: 1 }}>
+        {isSplashing && <Splash onFinish={() => setIsSplashing(false)} />}
+        <Stack>
+          <Stack.Screen name="index" options={{ headerShown: false }} />
+          <Stack.Screen name="login" options={{ headerShown: false }} />
+          <Stack.Screen name="signup" options={{ headerShown: false }} />
+          <Stack.Screen name="home" options={{ headerShown: false }} />
+          <Stack.Screen name="gift-detail" options={{ headerShown: false }} />
+        </Stack>
+      </View>
+    </ThemeProvider>
   );
 }

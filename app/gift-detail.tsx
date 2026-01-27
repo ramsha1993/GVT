@@ -45,7 +45,10 @@ function Model({ rotation }: { rotation: number }) {
   );
 }
 
+import { useTheme } from "../contexts/ThemeContext";
+
 export default function GiftDetail() {
+  const { isDarkMode } = useTheme();
   const [rotation, setRotation] = useState(0);
   const [assetLoaded, setAssetLoaded] = useState(false);
 
@@ -62,11 +65,11 @@ export default function GiftDetail() {
   }, []);
 
   return (
-    <SafeAreaView style={styles.container}>
+    <SafeAreaView style={[styles.container, isDarkMode && { backgroundColor: 'transparent' }]}>
       <Stack.Screen options={{ headerShown: false }} />
       <ScrollView contentContainerStyle={styles.scrollContent}>
         {/* 3D Model Viewer Container */}
-        <View style={styles.modelContainer}>
+        <View style={[styles.modelContainer, isDarkMode && styles.darkModelContainer]}>
           <View style={styles.loaderContainer}>
             <ActivityIndicator size="large" color="#C98B5E" />
           </View>
@@ -99,14 +102,15 @@ export default function GiftDetail() {
             maximumTrackTintColor="#BCA488" 
             thumbTintColor="#C98B5E" 
           />
-          <Text style={styles.sliderText}>Slide to Rotate</Text>
+          <Text style={[styles.sliderText, isDarkMode && styles.textGrey]}>Slide to Rotate</Text>
         </View>
 
         {/* Title Section */}
         <View style={styles.titleSection}>
-          <Text style={styles.titleItalic}>Hand Crafted</Text>
-          <Text style={styles.titleRegular}>Elephant Statue</Text>
-          <Text style={styles.description}>
+          <Text style={[styles.titleItalic, isDarkMode && styles.textWhite]}>Handcrafted</Text>
+          <Text style={[styles.titleRegular, isDarkMode && styles.textWhite]}>Elephant Statue</Text>
+          
+          <Text style={[styles.description, isDarkMode && styles.textGrey]}>
             A symbol of wisdom, strength, and prosperity, reflecting traditional craftsmanship and unity.
           </Text>
         </View>
@@ -114,88 +118,96 @@ export default function GiftDetail() {
         {/* Content Section */}
         <View style={styles.contentSection}>
           
-          {/* Gift Origin */}
-          <LinearGradient
-            colors={['rgba(255, 255, 255, 0.5)', 'rgba(255, 245, 228, 0.5)']}
-            style={styles.infoCard}
-          >
-            <View style={styles.iconContainer}>
-              <Image
-                source={require("../assets/images/globe.png")}
-                style={styles.icon}
-                resizeMode="contain"
-              />
-            </View>
-            <Text style={styles.cardTitle}>Gift Origin</Text>
-            <Text style={styles.cardText}>
+            {/* Gift Origin */}
+            <View style={[styles.infoCard, isDarkMode && styles.darkInfoCard]}>
+              <LinearGradient
+                colors={isDarkMode ? ['#FFFCB4', '#CBA969'] : ['rgba(255,255,255,0.4)', 'rgba(255,255,255,0.4)']}
+                style={[styles.iconContainer, isDarkMode && styles.goldIconContainer]}
+              >
+                <Image
+                  source={require("../assets/images/globe.png")}
+                  style={[styles.icon, isDarkMode && { tintColor: '#1A1A1A' }]}
+                  resizeMode="contain"
+                />
+              </LinearGradient>
+            <Text style={[styles.cardTitle, isDarkMode && styles.textWhite]}>Gift Origin</Text>
+            <Text style={[styles.cardText, isDarkMode && styles.textGrey]}>
               This statue was received from the Government of India during an official diplomatic visit in 2018, symbolizing the shared values of peace, cultural harmony, and respect between both nations.
             </Text>
-          </LinearGradient>
+            </View>
 
           {/* Gift Presentation */}
-          <LinearGradient
-            colors={['rgba(255, 255, 255, 0.5)', 'rgba(255, 245, 228, 0.5)']}
-            style={styles.infoCard}
-          >
-            <View style={styles.iconContainer}>
+          <View style={[styles.infoCard, isDarkMode && styles.darkInfoCard]}>
+            <LinearGradient
+                colors={isDarkMode ? ['#FFFCB4', '#CBA969'] : ['rgba(255,255,255,0.4)', 'rgba(255,255,255,0.4)']}
+                style={[styles.iconContainer, isDarkMode && styles.goldIconContainer]}
+              >
               <Image
                 source={require("../assets/images/wheat.png")}
-                style={styles.icon}
+                style={[styles.icon, isDarkMode && { tintColor: '#1A1A1A' }]}
                 resizeMode="contain"
               />
-            </View>
-            <Text style={styles.cardTitle}>Gift Presentation</Text>
-            <Text style={styles.cardText}>
+            </LinearGradient>
+            <Text style={[styles.cardTitle, isDarkMode && styles.textWhite]}>Gift Presentation</Text>
+            <Text style={[styles.cardText, isDarkMode && styles.textGrey]}>
               Formally presented during a state ceremony at the Presidential Palace, where leaders exchanged artifacts representing heritage.
             </Text>
-          </LinearGradient>
+          </View>
 
           {/* Material & Artistry */}
-          <LinearGradient
-            colors={['rgba(255, 255, 255, 0.5)', 'rgba(255, 245, 228, 0.5)']}
-            style={styles.infoCard}
-          >
-            <View style={styles.iconContainer}>
+          <View style={[styles.infoCard, isDarkMode && styles.darkInfoCard]}>
+             <LinearGradient
+                colors={isDarkMode ? ['#FFFCB4', '#CBA969'] : ['rgba(255,255,255,0.4)', 'rgba(255,255,255,0.4)']}
+                style={[styles.iconContainer, isDarkMode && styles.goldIconContainer]}
+              >
               <Image
                 source={require("../assets/images/books.png")}
-                style={styles.icon}
+                style={[styles.icon, isDarkMode && { tintColor: '#1A1A1A' }]}
                 resizeMode="contain"
               />
-            </View>
-            <Text style={styles.cardTitle}>Material & Artistry</Text>
+            </LinearGradient>
+            <Text style={[styles.cardTitle, isDarkMode && styles.textWhite]}>Material & Artistry</Text>
             <View style={styles.materialRow}>
               <View style={styles.materialColumn}>
-                <Text style={styles.materialLabel}>Material</Text>
-                <Text style={styles.materialValue}>White Marble</Text>
+                <Text style={[styles.materialLabel, isDarkMode && styles.textGrey]}>Material</Text>
+                <Text style={[styles.materialValue, isDarkMode && styles.textWhite]}>White Marble</Text>
               </View>
               <View style={styles.materialColumn}>
-                <Text style={styles.materialLabel}>Finish</Text>
-                <Text style={styles.materialValue}>24K Gold</Text>
+                <Text style={[styles.materialLabel, isDarkMode && styles.textGrey]}>Finish</Text>
+                <Text style={[styles.materialValue, isDarkMode && styles.textWhite]}>24K Gold</Text>
               </View>
             </View>
-          </LinearGradient>
+          </View>
 
           {/* Technical Essence */}
-          <View style={styles.technicalSection}>
-            <Text style={styles.technicalTitle}>Technical Essence</Text>
+          <View style={[styles.technicalSection, isDarkMode && styles.darkTechnicalSection]}>
+            <Text style={[styles.technicalTitle, isDarkMode && styles.textWhite]}>Technical Essence</Text>
             
             <View style={styles.technicalRow}>
               <Text style={styles.technicalLabel}>Dimensions</Text>
-              <Text style={styles.technicalValue}>12"H x 15"W x 8"D</Text>
+              <Text style={[styles.technicalValue, isDarkMode && styles.textWhite]}>12"H x 15"W x 8"D</Text>
             </View>
             
             <View style={styles.technicalRow}>
               <Text style={styles.technicalLabel}>Weight</Text>
-              <Text style={styles.technicalValue}>4.2 kg</Text>
+              <Text style={[styles.technicalValue, isDarkMode && styles.textWhite]}>4.2 kg</Text>
             </View>
             
             <View style={styles.technicalRow}>
               <Text style={styles.technicalLabel}>Authenticity</Text>
-              <Text style={styles.technicalValue}>Signed Certificate</Text>
+              <Text style={[styles.technicalValue, isDarkMode && styles.textWhite]}>Signed Certificate</Text>
             </View>
           </View>
         </View>
       </ScrollView>
+      {isDarkMode && (
+        <LinearGradient
+            colors={['#3E392C', '#08090C']}
+            style={[StyleSheet.absoluteFillObject, { zIndex: -2 }]}
+            start={{ x: 0.2, y: 0 }}
+            end={{ x: 0.8, y: 1 }}
+        />
+      )}
     </SafeAreaView>
   );
 }
@@ -203,7 +215,7 @@ export default function GiftDetail() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#FFF8E7", 
+    backgroundColor: "#FFEDCF", 
   },
   scrollContent: {
     flexGrow: 1,
@@ -312,52 +324,191 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     width: "100%",
     justifyContent: "space-around",
-    marginTop: 15,
+    marginTop: 20,
+    gap: 40,
   },
   materialColumn: {
     alignItems: "center",
   },
   materialLabel: {
     fontFamily: "InstrumentSans",
-    fontSize: 14,
-    color: "#C98B5E",
-    fontWeight: "700",
-    marginBottom: 5,
+    fontSize: 12,
+    color: "#888888",
+    fontWeight: "600",
+    marginBottom: 8,
+    textAlign: "center",
   },
   materialValue: {
     fontFamily: "InstrumentSans",
-    fontSize: 15,
+    fontSize: 14,
     color: "#2A2A2A",
+    fontWeight: "600",
+    textAlign: "center",
   },
   technicalSection: {
     marginTop: 20,
-    padding: 20,
+    padding: 30,
     backgroundColor: 'rgba(255,255,255,0.4)', 
-    borderRadius: 30,
+    borderRadius: 20,
   },
   technicalTitle: {
     fontFamily: "PlayfairDisplayItalic",
-    fontSize: 32,
+    fontSize: 28,
     color: "#2A2A2A",
     textAlign: "center",
-    marginBottom: 20,
+    marginBottom: 30,
   },
   technicalRow: {
     flexDirection: "row",
     justifyContent: "space-between",
-    paddingVertical: 15,
-    borderBottomWidth: 1,
-    borderBottomColor: "#D0C4A8",
+    paddingVertical: 12,
+    borderBottomWidth: 0,
   },
   technicalLabel: {
     fontFamily: "InstrumentSans",
-    fontSize: 16,
+    fontSize: 14,
     color: "#888888",
   },
   technicalValue: {
     fontFamily: "InstrumentSans",
-    fontSize: 16,
+    fontSize: 14,
     color: "#1A1A1A",
     fontWeight: "700",
   },
+  // New Styles
+  metadataRow: {
+    flexDirection: "row",
+    justifyContent: "center",
+    alignItems: "flex-start",
+    marginTop: 20,
+    gap: 15,
+  },
+  metadataItem: {
+    alignItems: "center",
+  },
+  metadataLabel: {
+    fontFamily: "InstrumentSans",
+    fontSize: 10,
+    color: "#2A2A2A",
+    fontWeight: "700",
+    marginBottom: 2,
+    textAlign: "center",
+  },
+  metadataValue: {
+    fontFamily: "InstrumentSans",
+    fontSize: 10,
+    color: "#2A2A2A",
+    fontWeight: "600",
+    textAlign: "center",
+  },
+  divider: {
+    width: 2,
+    height: 30,
+    backgroundColor: "#C98B5E",
+  },
+  originRow: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    width: "100%",
+    marginBottom: 20,
+  },
+  originItem: {
+    alignItems: "center",
+    flex: 1,
+    paddingHorizontal: 2,
+  },
+  originLabel: {
+    fontFamily: "InstrumentSans",
+    fontSize: 10,
+    color: "#5A5A5A",
+    fontWeight: "700",
+    marginBottom: 4,
+    textAlign: "center",
+  },
+  originValue: {
+    fontFamily: "InstrumentSans",
+    fontSize: 10,
+    color: "#1A1A1A",
+    fontWeight: "600",
+    textAlign: "center",
+    lineHeight: 14,
+  },
+  originDivider: {
+    width: 1,
+    height: "80%",
+    backgroundColor: "#C98B5E",
+    alignSelf: "center",
+  },
+  quoteBox: {
+    borderRadius: 20,
+    padding: 30,
+    marginBottom: 20,
+    position: "relative",
+    overflow: "hidden", 
+  },
+  quoteIcon: {
+    position: "absolute",
+    right: 20,
+    top: 20,
+    width: 80,
+    height: 80,
+    opacity: 0.8,
+    tintColor: "#FFFFFF" 
+  },
+  quoteText: {
+    fontFamily: "InstrumentSans",
+    fontSize: 18,
+    color: "#2A2A2A",
+    lineHeight: 26,
+    marginBottom: 20,
+    maxWidth: "90%",
+  },
+  authorSection: {
+    marginTop: 10,
+  },
+  authorName: {
+    fontFamily: "InstrumentSans",
+    fontSize: 16,
+    color: "#1A1A1A",
+    fontWeight: "bold",
+  },
+  authorTitle: {
+    fontFamily: "InstrumentSans",
+    fontSize: 12,
+    color: "#4A4A4A",
+    fontWeight: "bold",
+  },
+  // Dark Mode Styles
+  textWhite: { color: '#FFF' },
+  textGold: { color: '#CBA969' },
+  textGrey: { color: '#A0A0A0' },
+  darkModelContainer: {
+    backgroundColor: '#3E392C',
+  },
+  darkInfoCard: {
+    backgroundColor: '#0F0F0F',
+    borderColor: '#222',
+  },
+  goldIconContainer: {
+    backgroundColor: '#FFFCB4',
+    borderWidth: 0,
+    marginTop: -45, // Pulls the icon up to overlap/float
+    marginBottom: 20,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.3,
+    shadowRadius: 4,
+    elevation: 8,
+  },
+  darkIconContainer: {
+    // Replaced by goldIconContainer usage
+  },
+  darkTechnicalSection: {
+    backgroundColor: '#000000',
+    borderRadius: 20,
+  },
+  goldDivider: {
+    backgroundColor: '#CBA969',
+  },
+  // Removed unused styles
 });

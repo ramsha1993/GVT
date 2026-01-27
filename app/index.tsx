@@ -1,28 +1,42 @@
 import { Link } from "expo-router";
 import { StatusBar } from "expo-status-bar";
 import {
-    ImageBackground,
-    SafeAreaView,
-    StyleSheet,
-    Text,
-    TouchableOpacity,
-    View,
+  ImageBackground,
+  SafeAreaView,
+  StyleSheet,
+  Switch,
+  Text,
+  TouchableOpacity,
+  View
 } from "react-native";
+import { useTheme } from "../contexts/ThemeContext";
 
 export default function Index() {
-  return (
-    <ImageBackground
-      source={require("../assets/images/introbg.png")}
-      style={styles.background}
-      resizeMode="cover"
-    >
-      <StatusBar style="dark" />
+  const { isDarkMode, toggleTheme } = useTheme();
+
+  const content = (
+    <>
+      <View style={styles.topBar}>
+        <View style={styles.themeToggle}>
+          <Text style={[styles.themeLabel, { color: isDarkMode ? '#FFF' : '#1A1A1A' }]}>
+            Dark Mode
+          </Text>
+          <Switch
+            value={isDarkMode}
+            onValueChange={toggleTheme}
+            trackColor={{ false: "#767577", true: "#333" }}
+            thumbColor={isDarkMode ? "#C98B5E" : "#f4f3f4"}
+          />
+        </View>
+      </View>
+      
+      <StatusBar style={isDarkMode ? "light" : "dark"} />
       <SafeAreaView style={styles.contentContainer}>
         <View style={styles.textAndButtonsContainer}>
           <View style={styles.textContainer}>
-            <Text style={styles.welcomeText}>Welcome to Our</Text>
-            <Text style={styles.collectionText}>Gift Collection</Text>
-            <Text style={styles.descriptionText}>
+            <Text style={[styles.welcomeText, isDarkMode && styles.textWhite]}>Welcome to Our</Text>
+            <Text style={[styles.collectionText, isDarkMode && styles.textWhite]}>Gift Collection</Text>
+            <Text style={[styles.descriptionText, isDarkMode && styles.textWhiteDim]}>
               Explore a curated showcase of gifts presented to the Government of Abu
               Dhabi from nations and leaders around the world.{"\n"}
               Please log in with your official credentials or create an account to
@@ -31,19 +45,41 @@ export default function Index() {
           </View>
 
           <View style={styles.buttonContainer}>
-            <Link href="/signup" asChild>
-              <TouchableOpacity style={styles.signUpButton}>
-                <Text style={styles.signUpButtonText}>Sign Up</Text>
+            <Link href="/login" asChild>
+              <TouchableOpacity style={isDarkMode ? styles.buttonSignUpDark : styles.buttonSignUpLight}>
+                <Text style={isDarkMode ? styles.textSignUpDark : styles.textSignUpLight}>Sign Up</Text>
               </TouchableOpacity>
             </Link>
             <Link href="/login" asChild>
-              <TouchableOpacity style={styles.logInButton}>
-                <Text style={styles.logInButtonText}>Log In</Text>
+              <TouchableOpacity style={isDarkMode ? styles.buttonLogInDark : styles.buttonLogInLight}>
+                <Text style={isDarkMode ? styles.textLogInDark : styles.textLogInLight}>Log In</Text>
               </TouchableOpacity>
             </Link>
           </View>
         </View>
       </SafeAreaView>
+    </>
+  );
+
+  if (isDarkMode) {
+    return (
+      <ImageBackground
+        source={require("../assets/darkmode/dark_login_bg.png")}
+        style={styles.background}
+        resizeMode="cover"
+      >
+        {content}
+      </ImageBackground>
+    );
+  }
+
+  return (
+    <ImageBackground
+      source={require("../assets/images/introbg.png")}
+      style={styles.background}
+      resizeMode="cover"
+    >
+      {content}
     </ImageBackground>
   );
 }
@@ -92,32 +128,92 @@ const styles = StyleSheet.create({
     gap: 12,
     alignItems: "flex-start",
   },
-  signUpButton: {
+  // Explicit Button Styles
+  buttonSignUpLight: {
     backgroundColor: "#2C2C2C",
-    paddingVertical: 12,
-    paddingHorizontal: 28,
-    borderRadius: 30,
+    paddingVertical: 14,
+    paddingHorizontal: 32,
+    borderRadius: 25,
     alignItems: "center",
+    justifyContent: "center",
+    minWidth: 100,
   },
-  signUpButtonText: {
+  buttonSignUpDark: {
+    backgroundColor: '#CBA969',
+    paddingVertical: 14,
+    paddingHorizontal: 32,
+    borderRadius: 25,
+    alignItems: "center",
+    justifyContent: "center",
+    minWidth: 100,
+  },
+  textSignUpLight: {
     color: "#FFFFFF",
-    fontSize: 14,
-    fontWeight: "500",
+    fontSize: 15,
+    fontWeight: "600",
     fontFamily: "InstrumentSans",
   },
-  logInButton: {
-    backgroundColor: "transparent",
-    paddingVertical: 12,
-    paddingHorizontal: 28,
-    borderRadius: 30,
+  textSignUpDark: {
+    color: '#1A1A1A',
+    fontSize: 15,
+    fontWeight: "600",
+    fontFamily: "InstrumentSans",
+  },
+  buttonLogInLight: {
+    backgroundColor: "#FFFFFF",
+    paddingVertical: 14,
+    paddingHorizontal: 32,
+    borderRadius: 25,
     alignItems: "center",
-    borderWidth: 1,
-    borderColor: "#E5E5E5",
+    justifyContent: "center",
+    minWidth: 100,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 3,
   },
-  logInButtonText: {
-    color: "#2C2C2C",
+  buttonLogInDark: {
+    backgroundColor: '#FFFFFF',
+    paddingVertical: 14,
+    paddingHorizontal: 32,
+    borderRadius: 25,
+    alignItems: "center",
+    justifyContent: "center",
+    minWidth: 100,
+  },
+  textLogInLight: {
+    color: "#1A1A1A",
+    fontSize: 15,
+    fontWeight: "600",
+    fontFamily: "InstrumentSans",
+  },
+  textLogInDark: {
+    color: '#1A1A1A',
+    fontSize: 15,
+    fontWeight: "600",
+    fontFamily: "InstrumentSans",
+  },
+  topBar: {
+    position: 'absolute',
+    top: 50,
+    right: 20,
+    zIndex: 10,
+  },
+  themeToggle: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+  },
+  themeLabel: {
+    fontFamily: "InstrumentSans",
     fontSize: 14,
     fontWeight: "500",
-    fontFamily: "InstrumentSans",
+  },
+  textWhite: {
+    color: '#FFFFFF',
+  },
+  textWhiteDim: {
+    color: '#E0E0E0',
   },
 });

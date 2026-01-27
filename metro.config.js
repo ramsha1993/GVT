@@ -9,3 +9,4 @@ config.resolver.assetExts.push('glb', 'gltf', 'bin', 'obj', 'mtl');
 config.resolver.sourceExts.push('cjs');
 
 module.exports = config;
+    
