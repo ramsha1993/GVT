@@ -4,7 +4,6 @@ import {
   ImageBackground,
   SafeAreaView,
   StyleSheet,
-  Switch,
   Text,
   TouchableOpacity,
   View
@@ -16,19 +15,7 @@ export default function Index() {
 
   const content = (
     <>
-      <View style={styles.topBar}>
-        <View style={styles.themeToggle}>
-          <Text style={[styles.themeLabel, { color: isDarkMode ? '#FFF' : '#1A1A1A' }]}>
-            Dark Mode
-          </Text>
-          <Switch
-            value={isDarkMode}
-            onValueChange={toggleTheme}
-            trackColor={{ false: "#767577", true: "#333" }}
-            thumbColor={isDarkMode ? "#C98B5E" : "#f4f3f4"}
-          />
-        </View>
-      </View>
+
       
       <StatusBar style={isDarkMode ? "light" : "dark"} />
       <SafeAreaView style={styles.contentContainer}>
@@ -194,22 +181,7 @@ const styles = StyleSheet.create({
     fontWeight: "600",
     fontFamily: "InstrumentSans",
   },
-  topBar: {
-    position: 'absolute',
-    top: 50,
-    right: 20,
-    zIndex: 10,
-  },
-  themeToggle: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 8,
-  },
-  themeLabel: {
-    fontFamily: "InstrumentSans",
-    fontSize: 14,
-    fontWeight: "500",
-  },
+
   textWhite: {
     color: '#FFFFFF',
   },

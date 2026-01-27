@@ -400,7 +400,7 @@ const styles = StyleSheet.create({
     top: 30,
     width: 100,
     height: 100,
-    opacity: 0.8,
+    opacity: 0.4,
     tintColor: "#FFFFFF" 
   },
   quoteText: {
@@ -463,7 +463,7 @@ const styles = StyleSheet.create({
   },
   // Dark Mode Styles
   textWhite: { color: '#FFF' },
-  textGold: { color: '#CBA969' },
+  textGold: { color: '#fff' },
   textGrey: { color: '#A0A0A0' },
   goldLine: { backgroundColor: '#CBA969' },
   darkModelContainer: {
@@ -474,6 +474,6 @@ const styles = StyleSheet.create({
     borderColor: '#CBA969',
   },
   darkTechnicalSection: {
-    backgroundColor: '#1E1E1E',
+    backgroundColor: 'black',
   },
 });

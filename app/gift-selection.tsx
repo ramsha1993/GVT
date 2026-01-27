@@ -35,11 +35,6 @@ export default function GiftSelection() {
           style={styles.profileImage}
           resizeMode="cover"
         />
-        <Pressable style={styles.menuButton}>
-          <View style={[styles.menuLine, isDarkMode && styles.goldLine]} />
-          <View style={[styles.menuLine, isDarkMode && styles.goldLine]} />
-          <View style={[styles.menuLine, isDarkMode && styles.goldLine]} />
-        </Pressable>
       </View>
 
       {/* Title Section */}
