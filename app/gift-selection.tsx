@@ -1,14 +1,14 @@
 import { LinearGradient } from "expo-linear-gradient";
 import { Stack, useRouter } from "expo-router";
 import {
-    Dimensions,
-    Image,
-    Pressable,
-    SafeAreaView,
-    ScrollView,
-    StyleSheet,
-    Text,
-    View,
+  Dimensions,
+  Image,
+  Pressable,
+  SafeAreaView,
+  ScrollView,
+  StyleSheet,
+  Text,
+  View,
 } from "react-native";
 import { useTheme } from "../contexts/ThemeContext";
 
@@ -19,11 +19,11 @@ export default function GiftSelection() {
   const { isDarkMode } = useTheme();
 
   const handleGiftSend = () => {
-    router.push("/home");
+    router.push({ pathname: "/home", params: { type: "sent" } });
   };
 
   const handleGiftReceived = () => {
-    router.push("/home");
+    router.push({ pathname: "/home", params: { type: "received" } });
   };
 
   const content = (
@@ -39,10 +39,8 @@ export default function GiftSelection() {
 
       {/* Title Section */}
       <View style={styles.titleSection}>
-        <Text style={[styles.greeting, isDarkMode && styles.textWhite]}>Greeting</Text>
-        <Text style={[styles.subtitle, isDarkMode && styles.textGold]}>Hope you're well</Text>
         <Text style={[styles.description, isDarkMode && styles.textGrey]}>
-          Welcome to your personal collection. Explore the distinguished gifts presented to Abu Dhabi, symbolizing respect, friendship, and global collaboration.
+          Welcome to your personal collection. Let's explore distinguished gifts received and sent with symbolizing respect, friendship, and global collaboration.
         </Text>
       </View>
 
@@ -90,7 +88,7 @@ export default function GiftSelection() {
           <View style={[styles.card, isDarkMode && styles.darkCard]}>
             {isDarkMode && <View style={styles.cardGoldBorder} />}
             <Image
-              source={require("../assets/icons/recieved.png")}
+              source={require("../assets/icons/reciever_l.png")}
               style={[styles.icon, isDarkMode && { tintColor: '#CBA969' }]}
               resizeMode="contain"
             />
@@ -189,7 +187,8 @@ const styles = StyleSheet.create({
   description: {
     fontFamily: "InstrumentSans",
     fontSize: 14,
-    color: "#5A5A5A",
+    fontWeight: "700",
+    color: "#343332",
     lineHeight: 22,
     marginTop: 15,
   },
@@ -258,13 +257,13 @@ const styles = StyleSheet.create({
     color: '#CBA969',
   },
   textGrey: {
-    color: '#A0A0A0',
+    color: '#fff',
   },
   goldLine: {
     backgroundColor: '#CBA969',
   },
   darkCurvedContainer: {
-    backgroundColor: 'transparent',
+    backgroundColor: '#2E2D2C',
     borderTopWidth: 1,
     borderLeftWidth: 1,
     borderRightWidth: 1,

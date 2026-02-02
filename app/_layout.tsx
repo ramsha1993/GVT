@@ -1,5 +1,5 @@
 import { useFonts } from 'expo-font';
-import { Stack } from 'expo-router';
+import { Stack, useSegments } from 'expo-router';
 import { useState } from 'react';
 import { View } from 'react-native';
 import 'react-native-reanimated';
@@ -16,6 +16,19 @@ export default function RootLayout() {
   });
 
   const [isSplashing, setIsSplashing] = useState(true);
+  const segments = useSegments();
+
+  // Determine if we should show the language button
+  // Show on index (landing), login, signup. Hide on others (home, gift-detail, etc.)
+  // segments[0] might be (tabs) or similar if using groups, but here files are flat in app/ or just screen names.
+  // We can check the route name.
+  // Actually useSegments returns distinct segments.
+  // For 'app/index.tsx', segments might be empty or ['index']?
+  // Let's rely on checking if the current screen is one of the public ones.
+  // If segments is empty, it's index.
+  const routeName = segments[segments.length - 1]; 
+  const showLanguageButton = !routeName || ['index', 'login', 'signup'].includes(routeName);
+
 
   if (!loaded) {
     return null;
@@ -27,9 +40,13 @@ export default function RootLayout() {
         <View style={{ position: 'absolute', top: 50, right: 20, zIndex: 9999 }}>
             <ThemeToggle />
         </View>
-        <View style={{ position: 'absolute', top: 50, left: 24, zIndex: 9999 }}>
-            <LanguageButton />
-        </View>
+        
+        {showLanguageButton && (
+          <View style={{ position: 'absolute', top: 50, left: 24, zIndex: 9999 }}>
+              <LanguageButton />
+          </View>
+        )}
+
         {isSplashing && <Splash onFinish={() => setIsSplashing(false)} />}
         <Stack>
           <Stack.Screen name="index" options={{ headerShown: false }} />

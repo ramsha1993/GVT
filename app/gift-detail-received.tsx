@@ -406,7 +406,7 @@ export default function GiftDetailReceived() {
 
         {/* Quote Box */}
         <LinearGradient
-          colors={['rgba(208, 140, 91, 0.5)', 'rgba(208, 140, 91, 0.25)']}
+          colors={['#000000', '#121212']}
           style={styles.quoteBox}
           start={{ x: 0, y: 0 }}
           end={{ x: 0, y: 1 }}

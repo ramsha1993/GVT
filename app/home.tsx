@@ -1,6 +1,6 @@
 import { Ionicons } from "@expo/vector-icons";
 import { LinearGradient } from "expo-linear-gradient";
-import { Stack, useRouter } from "expo-router";
+import { Stack, useLocalSearchParams, useRouter } from "expo-router";
 import { useState } from "react";
 import {
   Dimensions,
@@ -23,6 +23,102 @@ export default function Home() {
   const { isDarkMode } = useTheme();
   const [filterVisible, setFilterVisible] = useState(false);
 
+  const { type } = useLocalSearchParams();
+  const isSent = type === 'sent';
+  const sectionTitle = isSent ? "Gifts Sent" : "Gifts Received";
+
+  // Define contents for Sent vs Received
+  // Sent -> Elephant -> gift-detail
+  // Received -> Peacock -> gift-detail-received
+
+  const renderGiftCard = () => {
+    if (isSent) {
+      // Sent: Elephant
+      return isDarkMode ? (
+        <LinearGradient
+          colors={['#FFFCB4', '#CBA969']}
+          start={{ x: 0, y: 0 }}
+          end={{ x: 1, y: 1 }}
+          style={[styles.giftCard, { borderWidth: 0 }]}
+        >
+            <Image
+            source={require("../assets/images/giftimg2.png")}
+            style={[styles.giftImage, { borderRadius: 20 }]}
+            resizeMode="contain"
+          />
+          <Text style={styles.giftTitle}>Handcrafted Elephant Statue</Text>
+          <Text style={styles.giftDescription}>
+            A symbol of wisdom and strength, intricately designed with traditional artistry.
+          </Text>
+          <TouchableOpacity
+            style={styles.learnMoreButton}
+            onPress={() => router.push("/gift-detail")}
+          >
+            <Text style={styles.learnMoreText}>Learn More</Text>
+          </TouchableOpacity>
+        </LinearGradient>
+      ) : (
+        <View style={styles.giftCard}>
+          <Image
+            source={require("../assets/images/giftimg2.png")}
+            style={styles.giftImage}
+            resizeMode="contain"
+          />
+          <Text style={styles.giftTitle}>Handcrafted Elephant Statue</Text>
+          <Text style={styles.giftDescription}>
+            A symbol of wisdom and strength, intricately designed with traditional artistry.
+          </Text>
+          <TouchableOpacity
+            style={styles.learnMoreButton}
+            onPress={() => router.push("/gift-detail")}
+          >
+            <Text style={styles.learnMoreText}>Learn More</Text>
+          </TouchableOpacity>
+        </View>
+      );
+    } else {
+      // Received: Peacock
+      return isDarkMode ? (
+        <LinearGradient
+          colors={['#FFFCB4', '#CBA969']}
+          start={{ x: 0, y: 0 }}
+          end={{ x: 1, y: 1 }}
+          style={[styles.giftCard, { borderWidth: 0 }]}
+        >
+          <Image
+            source={require("../assets/images/giftimg1.png")}
+            style={[styles.giftImage, { borderRadius: 20 }]}
+            resizeMode="contain"
+          />
+          <Text style={styles.giftTitle}>Handcrafted Peacock Statue</Text>
+ 
+          <TouchableOpacity
+            style={styles.learnMoreButton}
+            onPress={() => router.push("/gift-detail-received")}
+          >
+            <Text style={styles.learnMoreText}>Learn More</Text>
+          </TouchableOpacity>
+        </LinearGradient>
+      ) : (
+        <View style={styles.giftCard}>
+          <Image
+            source={require("../assets/images/giftimg1.png")}
+            style={styles.giftImage}
+            resizeMode="contain"
+          />
+          <Text style={styles.giftTitle}>Handcrafted Peacock Statue</Text>
+ 
+          <TouchableOpacity
+            style={styles.learnMoreButton}
+            onPress={() => router.push("/gift-detail-received")}
+          >
+            <Text style={styles.learnMoreText}>Learn More</Text>
+          </TouchableOpacity>
+        </View>
+      );
+    }
+  };
+
   const content = (
     <SafeAreaView style={[styles.container, isDarkMode && { backgroundColor: 'transparent' }]}>
       <Stack.Screen options={{ headerShown: false }} />
@@ -39,99 +135,13 @@ export default function Home() {
         <View style={[styles.curvedContainer, isDarkMode && styles.darkCurvedContainer]}>
           {/* Gifts Section */}
           <View style={styles.giftsSection}>
-            <Text style={[styles.sectionTitle, isDarkMode && styles.textWhite]}>Gifts Received</Text>
+            <Text style={[styles.sectionTitle, isDarkMode && styles.textWhite]}>{sectionTitle}</Text>
             <Text style={[styles.sectionDescription, isDarkMode && styles.textGrey]}>
               A glimpse into the remarkable artifacts and handcrafted treasures shared through
               international goodwill.
             </Text>
 
-            {/* Gift Card 1 */}
-            {isDarkMode ? (
-              <LinearGradient
-                colors={['#FFFCB4', '#CBA969']}
-                start={{ x: 0, y: 0 }}
-                end={{ x: 1, y: 1 }}
-                style={[styles.giftCard, { borderWidth: 0 }]}
-              >
-                 <Image
-                  source={require("../assets/images/giftimg2.png")}
-                  style={[styles.giftImage, { borderRadius: 20 }]}
-                  resizeMode="contain"
-                />
-                <Text style={styles.giftTitle}>Handcrafted Elephant Statue</Text>
-                <Text style={styles.giftDescription}>
-                  A symbol of wisdom and strength, intricately designed with traditional artistry.
-                </Text>
-                <TouchableOpacity
-                  style={styles.learnMoreButton}
-                  onPress={() => router.push("/gift-detail")}
-                >
-                  <Text style={styles.learnMoreText}>Learn More</Text>
-                </TouchableOpacity>
-              </LinearGradient>
-            ) : (
-              <View style={styles.giftCard}>
-                <Image
-                  source={require("../assets/images/giftimg2.png")}
-                  style={styles.giftImage}
-                  resizeMode="contain"
-                />
-                <Text style={styles.giftTitle}>Handcrafted Elephant Statue</Text>
-                <Text style={styles.giftDescription}>
-                  A symbol of wisdom and strength, intricately designed with traditional artistry.
-                </Text>
-                <TouchableOpacity
-                  style={styles.learnMoreButton}
-                  onPress={() => router.push("/gift-detail")}
-                >
-                  <Text style={styles.learnMoreText}>Learn More</Text>
-                </TouchableOpacity>
-              </View>
-            )}
-
-            {/* Gift Card 2 */}
-            {isDarkMode ? (
-              <LinearGradient
-                colors={['#FFFCB4', '#CBA969']}
-                start={{ x: 0, y: 0 }}
-                end={{ x: 1, y: 1 }}
-                style={[styles.giftCard, { borderWidth: 0 }]}
-              >
-                <Image
-                  source={require("../assets/images/giftimg1.png")}
-                  style={[styles.giftImage, { borderRadius: 20 }]}
-                  resizeMode="contain"
-                />
-                <Text style={styles.giftTitle}>Handcrafted Peacock Sculpture</Text>
-                <Text style={styles.giftDescription}>
-                  Representing beauty and grace, this piece embodies cultural elegance.
-                </Text>
-                <TouchableOpacity
-                  style={styles.learnMoreButton}
-                  onPress={() => router.push("/gift-detail-received")}
-                >
-                  <Text style={styles.learnMoreText}>Learn More</Text>
-                </TouchableOpacity>
-              </LinearGradient>
-            ) : (
-              <View style={styles.giftCard}>
-                <Image
-                  source={require("../assets/images/giftimg1.png")}
-                  style={styles.giftImage}
-                  resizeMode="contain"
-                />
-                <Text style={styles.giftTitle}>Handcrafted Peacock Sculpture</Text>
-                <Text style={styles.giftDescription}>
-                  Representing beauty and grace, this piece embodies cultural elegance.
-                </Text>
-                <TouchableOpacity
-                  style={styles.learnMoreButton}
-                  onPress={() => router.push("/gift-detail-received")}
-                >
-                  <Text style={styles.learnMoreText}>Learn More</Text>
-                </TouchableOpacity>
-              </View>
-            )}
+            {renderGiftCard()}
           </View>
         </View>
       </ScrollView>
