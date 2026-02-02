@@ -3,6 +3,7 @@ import { Stack } from 'expo-router';
 import { useState } from 'react';
 import { View } from 'react-native';
 import 'react-native-reanimated';
+import LanguageButton from '../components/LanguageButton';
 import ThemeToggle from '../components/ThemeToggle';
 import { ThemeProvider } from '../contexts/ThemeContext';
 import Splash from './splash';
@@ -25,6 +26,9 @@ export default function RootLayout() {
       <View style={{ flex: 1 }}>
         <View style={{ position: 'absolute', top: 50, right: 20, zIndex: 9999 }}>
             <ThemeToggle />
+        </View>
+        <View style={{ position: 'absolute', top: 50, left: 24, zIndex: 9999 }}>
+            <LanguageButton />
         </View>
         {isSplashing && <Splash onFinish={() => setIsSplashing(false)} />}
         <Stack>

@@ -4,7 +4,9 @@ import { useGLTF } from "@react-three/drei/native";
 import { Canvas, useFrame } from "@react-three/fiber/native";
 import { Asset } from "expo-asset";
 import { LinearGradient } from "expo-linear-gradient";
+import * as Print from 'expo-print';
 import { Stack, useRouter } from "expo-router";
+import * as Sharing from 'expo-sharing';
 import { Suspense, useEffect, useRef, useState } from "react";
 import {
   ActivityIndicator,
@@ -21,6 +23,15 @@ import * as THREE from "three";
 import "../polyfills";
 
 const { width } = Dimensions.get("window");
+
+// Gallery images
+const galleryImages = [
+  require('../assets/gallery/peacock/Rectangle20.png'),
+  require('../assets/gallery/peacock/Rectangle21.png'),
+  require('../assets/gallery/peacock/Rectangle22.png'),
+  require('../assets/gallery/peacock/Rectangle23.png'),
+  require('../assets/gallery/peacock/Rectangle24.png'),
+];
 
 // Reusing the elephant model as placeholder since peacock model wasn't found
 const modelAsset = Asset.fromModule(require("../assets/3dmodel/elephant_3d.glb"));
@@ -50,6 +61,10 @@ import { useTheme } from "../contexts/ThemeContext";
 
 const AccordionItem = ({ title, value, isOpen, onPress }: { title: string, value?: string, isOpen: boolean, onPress: () => void }) => {
   const { isDarkMode } = useTheme();
+
+  const handleDownload = () => {
+    console.log("Downloading PDF...");
+  };
   return (
     <View style={[styles.accordionContainer, isDarkMode && styles.darkAccordion]}>
       <TouchableOpacity style={styles.accordionHeader} onPress={onPress}>
@@ -70,6 +85,154 @@ export default function GiftDetailReceived() {
   const { isDarkMode } = useTheme();
   const [rotation, setRotation] = useState(0);
   const [assetLoaded, setAssetLoaded] = useState(false);
+  const [selectedView, setSelectedView] = useState<'model' | number>('model');
+  
+  const handleDownload = async () => {
+    try {
+      const htmlContent = `
+        <!DOCTYPE html>
+        <html>
+        <head>
+          <meta name="viewport" content="width=device-width, initial-scale=1.0">
+          <style>
+            body {
+              font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+              padding: 40px;
+              background: #FFEDCF;
+              color: #2A2A2A;
+            }
+            .header {
+              text-align: center;
+              margin-bottom: 40px;
+            }
+            .title {
+              font-size: 32px;
+              font-style: italic;
+              margin-bottom: 20px;
+              color: #2A2A2A;
+            }
+            .metadata {
+              display: flex;
+              justify-content: center;
+              gap: 20px;
+              margin: 20px 0;
+              font-size: 12px;
+            }
+            .metadata-item {
+              text-align: center;
+            }
+            .metadata-label {
+              font-weight: bold;
+              margin-bottom: 4px;
+            }
+            .section {
+              background: white;
+              border-radius: 15px;
+              padding: 25px;
+              margin: 20px 0;
+            }
+            .section-title {
+              font-size: 20px;
+              font-weight: 600;
+              margin-bottom: 15px;
+              color: #2A2A2A;
+            }
+            .section-content {
+              font-size: 14px;
+              line-height: 1.6;
+              color: #4A4A4A;
+            }
+            .detail-row {
+              display: flex;
+              justify-content: space-between;
+              padding: 12px 0;
+              border-bottom: 1px solid #E0E0E0;
+            }
+            .detail-label {
+              color: #888888;
+            }
+            .detail-value {
+              font-weight: 600;
+            }
+            .technical-row {
+              display: flex;
+              justify-content: space-between;
+              padding: 12px 0;
+              border-bottom: 1px solid #E0E0E0;
+            }
+          </style>
+        </head>
+        <body>
+          <div class="header">
+            <div class="title">Handcrafted<br/>Elephant Statue</div>
+            <div class="metadata">
+              <div class="metadata-item">
+                <div class="metadata-label">Collection Number</div>
+                <div>UAE-IND-2018-04</div>
+              </div>
+              <div class="metadata-item">
+                <div class="metadata-label">Category</div>
+                <div>Sculpture</div>
+              </div>
+              <div class="metadata-item">
+                <div class="metadata-label">Gift Type</div>
+                <div>Received</div>
+              </div>
+            </div>
+            <p style="text-align: center; color: #5A5A5A; font-size: 14px; margin-top: 15px;">
+              A symbol of wisdom, strength, and prosperity, reflecting traditional craftsmanship and unity.
+            </p>
+          </div>
+
+          <div class="section">
+            <div class="section-title">Gift Details</div>
+            <div class="detail-row">
+              <div class="detail-label">Quantity</div>
+              <div class="detail-value">100 Pcs</div>
+            </div>
+            <div class="detail-row">
+              <div class="detail-label">Country Of Origin</div>
+              <div class="detail-value">India</div>
+            </div>
+            <div class="detail-row">
+              <div class="detail-label">Date</div>
+              <div class="detail-value">January 24, 2018</div>
+            </div>
+            <div class="detail-row">
+              <div class="detail-label">Location</div>
+              <div class="detail-value">Presidential Palace, Abu Dhabi</div>
+            </div>
+            <div class="detail-row" style="border-bottom: none;">
+              <div class="detail-label">Material</div>
+              <div class="detail-value">White Marble with 24K Gold Finish</div>
+            </div>
+          </div>
+
+          <div class="section">
+            <div class="section-title">Technical Essence</div>
+            <div class="technical-row">
+              <div class="detail-label">Dimensions</div>
+              <div class="detail-value">12" H x 15" W x 8" D</div>
+            </div>
+            <div class="technical-row">
+              <div class="detail-label">Weight</div>
+              <div class="detail-value">4.2 kg</div>
+            </div>
+            <div class="technical-row" style="border-bottom: none;">
+              <div class="detail-label">Authenticity</div>
+              <div class="detail-value">Signed Certificate</div>
+            </div>
+          </div>
+        </body>
+        </html>
+      `;
+
+      const { uri } = await Print.printToFileAsync({ html: htmlContent });
+      await Sharing.shareAsync(uri, { UTI: '.pdf', mimeType: 'application/pdf' });
+    } catch (error) {
+      console.error('Error generating PDF:', error);
+    }
+  };
   
   // Accordion states
   const [openSection, setOpenSection] = useState<string | null>("Quantity");
@@ -97,7 +260,7 @@ export default function GiftDetailReceived() {
       <ScrollView contentContainerStyle={styles.scrollContent}>
         {/* 3D Model Viewer */}
         <View style={[styles.modelContainer, isDarkMode && styles.darkModelContainer]}>
-          {assetLoaded ? (
+          {assetLoaded && selectedView === 'model' ? (
             <Canvas camera={{ position: [0, 0, 5], fov: 50 }} style={{ flex: 1 }}>
               <ambientLight intensity={7} />
               <directionalLight position={[10, 10, 5]} intensity={2} />
@@ -106,25 +269,72 @@ export default function GiftDetailReceived() {
                 <Model rotation={rotation} />
               </Suspense>
             </Canvas>
+          ) : selectedView !== 'model' ? (
+            <Image
+              source={galleryImages[selectedView as number]}
+              style={styles.mainImage}
+              resizeMode="contain"
+            />
           ) : (
             <ActivityIndicator size="large" color="#C98B5E" />
           )}
         </View>
 
-        {/* Slider */}
-        <View style={styles.controlsSection}>
-          <Slider
-            style={styles.slider}
-            minimumValue={0}
-            maximumValue={Math.PI * 2}
-            value={rotation}
-            onValueChange={setRotation}
-            minimumTrackTintColor="#C98B5E"
-            maximumTrackTintColor="#D0C4A8"
-            thumbTintColor="#C98B5E"
-          />
-          <Text style={[styles.sliderText, isDarkMode && styles.textGrey]}>Slide to Rotate</Text>
+        {/* Thumbnail Gallery */}
+        <View style={styles.gallerySection}>
+          <ScrollView 
+            horizontal 
+            showsHorizontalScrollIndicator={false}
+            contentContainerStyle={styles.galleryContent}
+          >
+            {/* 3D Model Thumbnail */}
+            <TouchableOpacity 
+              style={[
+                styles.thumbnail,
+                selectedView === 'model' && styles.thumbnailSelected
+              ]}
+              onPress={() => setSelectedView('model')}
+              activeOpacity={0.7}
+            >
+              <View style={styles.thumbnailModel}>
+                <Ionicons name="cube-outline" size={32} color="#C98B5E" />
+                <Text style={styles.thumbnailModelText}>3D</Text>
+              </View>
+            </TouchableOpacity>
+
+            {/* Image Thumbnails */}
+            {galleryImages.map((img, index) => (
+              <TouchableOpacity
+                key={index}
+                style={[
+                  styles.thumbnail,
+                  selectedView === index && styles.thumbnailSelected
+                ]}
+                onPress={() => setSelectedView(index)}
+                activeOpacity={0.7}
+              >
+                <Image source={img} style={styles.thumbnailImage} resizeMode="cover" />
+              </TouchableOpacity>
+            ))}
+          </ScrollView>
         </View>
+
+        {/* Slider - Only show when 3D model is active */}
+        {selectedView === 'model' && (
+          <View style={styles.controlsSection}>
+            <Slider
+              style={styles.slider}
+              minimumValue={0}
+              maximumValue={Math.PI * 2}
+              value={rotation}
+              onValueChange={setRotation}
+              minimumTrackTintColor="#C98B5E"
+              maximumTrackTintColor="#D0C4A8"
+              thumbTintColor="#C98B5E"
+            />
+            <Text style={[styles.sliderText, isDarkMode && styles.textGrey]}>Slide to Rotate</Text>
+          </View>
+        )}
 
         {/* Title & Metadata */}
         <View style={styles.titleSection}>
@@ -155,6 +365,18 @@ export default function GiftDetailReceived() {
 
         {/* Accordions */}
         <View style={styles.accordionSection}>
+           <TouchableOpacity onPress={handleDownload} activeOpacity={0.8} style={{ marginBottom: 20 }}>
+            <LinearGradient
+              colors={isDarkMode ? ['#FFF8D5', '#CBA969'] : ['#2A2A2A', '#2A2A2A']}
+              start={{ x: 0, y: 0 }}
+              end={{ x: 1, y: 0 }}
+              style={styles.downloadButtonReceived}
+            >
+              <Text style={[styles.downloadButtonTextReceived, !isDarkMode && { color: '#FFF' }]}>Download PDF</Text>
+              <Ionicons name="download-outline" size={24} color={isDarkMode ? "#1A1A1A" : "#FFFFFF"} />
+            </LinearGradient>
+          </TouchableOpacity>
+
            {/* Wrapping map could be better but sticking to manual items for now */}
            <View style={[styles.accordionContainer, isDarkMode && styles.darkAccordion]}>
              <TouchableOpacity style={styles.accordionHeader} onPress={() => toggleSection("Quantity")}>
@@ -475,5 +697,66 @@ const styles = StyleSheet.create({
   },
   darkTechnicalSection: {
     backgroundColor: 'black',
+  },
+  downloadButtonReceived: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+    paddingVertical: 18,
+    borderRadius: 30,
+    gap: 10,
+    width: "100%",
+  },
+  downloadButtonTextReceived: {
+    fontFamily: "InstrumentSans",
+    fontSize: 16,
+    color: "#1A1A1A",
+    fontWeight: "500",
+  },
+  // Gallery Styles
+  mainImage: {
+    width: '100%',
+    height: '100%',
+  },
+  gallerySection: {
+    backgroundColor: '#2A2A2A',
+    paddingVertical: 15,
+    paddingHorizontal: 10,
+    marginBottom: 20,
+  },
+  galleryContent: {
+    paddingHorizontal: 10,
+    gap: 12,
+  },
+  thumbnail: {
+    width: 80,
+    height: 80,
+    borderRadius: 15,
+    overflow: 'hidden',
+    backgroundColor: '#3A3A3A',
+    marginRight: 12,
+    borderWidth: 3,
+    borderColor: 'transparent',
+  },
+  thumbnailSelected: {
+    borderColor: '#C98B5E',
+  },
+  thumbnailImage: {
+    width: '100%',
+    height: '100%',
+  },
+  thumbnailModel: {
+    width: '100%',
+    height: '100%',
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: '#3A3A3A',
+  },
+  thumbnailModelText: {
+    color: '#C98B5E',
+    fontSize: 10,
+    fontFamily: 'InstrumentSans',
+    fontWeight: '600',
+    marginTop: 4,
   },
 });

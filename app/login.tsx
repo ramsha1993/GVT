@@ -3,15 +3,15 @@ import { LinearGradient } from "expo-linear-gradient";
 import { Stack, useRouter } from "expo-router";
 import { useState } from "react";
 import {
-  KeyboardAvoidingView,
-  Platform,
-  SafeAreaView,
-  ScrollView,
-  StyleSheet,
-  Text,
-  TextInput,
-  TouchableOpacity,
-  View
+    KeyboardAvoidingView,
+    Platform,
+    SafeAreaView,
+    ScrollView,
+    StyleSheet,
+    Text,
+    TextInput,
+    TouchableOpacity,
+    View
 } from "react-native";
 import { useTheme } from "../contexts/ThemeContext";
 
@@ -39,6 +39,10 @@ export default function Login() {
         start={{ x: 0.2, y: 0 }}
         end={{ x: 0.8, y: 1 }}
       >
+        <Stack.Screen options={{ headerShown: false }} />
+        
+        <Stack.Screen options={{ headerShown: false }} />
+        
         <Stack.Screen options={{ headerShown: false }} />
         
         <Stack.Screen options={{ headerShown: false }} />

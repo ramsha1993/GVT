@@ -18,30 +18,26 @@ export default function Index() {
 
       
       <StatusBar style={isDarkMode ? "light" : "dark"} />
+      <StatusBar style={isDarkMode ? "light" : "dark"} />
       <SafeAreaView style={styles.contentContainer}>
-        <View style={styles.textAndButtonsContainer}>
+        <View style={[styles.textAndButtonsContainer, isDarkMode && { alignItems: 'flex-end' }]}>
           <View style={styles.textContainer}>
-            <Text style={[styles.welcomeText, isDarkMode && styles.textWhite]}>Welcome to Our</Text>
-            <Text style={[styles.collectionText, isDarkMode && styles.textWhite]}>Gift Collection</Text>
-            <Text style={[styles.descriptionText, isDarkMode && styles.textWhiteDim]}>
-              Explore a curated showcase of gifts presented to the Government of Abu
-              Dhabi from nations and leaders around the world.{"\n"}
-              Please log in with your official credentials or create an account to
-              begin your journey through this distinguished collection.
+            <Text style={[styles.welcomeText, isDarkMode && styles.textWhite, isDarkMode && { textAlign: 'right' }]}>Welcome to Our</Text>
+            <Text style={[styles.collectionText, isDarkMode && styles.textWhite, isDarkMode && { textAlign: 'right' }]}>Gift Collection</Text>
+            <Text style={[styles.descriptionText, isDarkMode && styles.textWhiteDim, isDarkMode && { textAlign: 'right' }]}>
+            This platform provides authorized access to official gifts received and exchanged.
+            {"\n"}{"\n"}
+            Kindly sign in to proceed.
             </Text>
           </View>
 
           <View style={styles.buttonContainer}>
             <Link href="/login" asChild>
               <TouchableOpacity style={isDarkMode ? styles.buttonSignUpDark : styles.buttonSignUpLight}>
-                <Text style={isDarkMode ? styles.textSignUpDark : styles.textSignUpLight}>Sign Up</Text>
+                <Text style={isDarkMode ? styles.textSignUpDark : styles.textSignUpLight}>Login</Text>
               </TouchableOpacity>
             </Link>
-            <Link href="/login" asChild>
-              <TouchableOpacity style={isDarkMode ? styles.buttonLogInDark : styles.buttonLogInLight}>
-                <Text style={isDarkMode ? styles.textLogInDark : styles.textLogInLight}>Log In</Text>
-              </TouchableOpacity>
-            </Link>
+
           </View>
         </View>
       </SafeAreaView>

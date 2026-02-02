@@ -1,9 +1,12 @@
+import { Ionicons } from "@expo/vector-icons";
 import Slider from "@react-native-community/slider";
 import { useGLTF } from "@react-three/drei/native";
 import { Canvas, useFrame } from "@react-three/fiber/native";
 import { Asset } from "expo-asset";
 import { LinearGradient } from "expo-linear-gradient";
+import * as Print from 'expo-print';
 import { Stack } from "expo-router";
+import * as Sharing from 'expo-sharing';
 import { Suspense, useEffect, useRef, useState } from "react";
 import {
   ActivityIndicator,
@@ -13,12 +16,22 @@ import {
   ScrollView,
   StyleSheet,
   Text,
+  TouchableOpacity,
   View,
 } from "react-native";
 import * as THREE from "three";
 import "../polyfills";
 
 const { width } = Dimensions.get("window");
+
+// Gallery images
+const galleryImages = [
+  require('../assets/gallery/elepehant/Rectangle20.png'),
+  require('../assets/gallery/elepehant/Rectangle21.png'),
+  require('../assets/gallery/elepehant/Rectangle22.png'),
+  require('../assets/gallery/elepehant/Rectangle23.png'),
+  require('../assets/gallery/elepehant/Rectangle24.png'),
+];
 
 // Preload the asset to ensure it's available
 const modelAsset = Asset.fromModule(require("../assets/3dmodel/elephant_3d.glb"));
@@ -51,6 +64,7 @@ export default function GiftDetail() {
   const { isDarkMode } = useTheme();
   const [rotation, setRotation] = useState(0);
   const [assetLoaded, setAssetLoaded] = useState(false);
+  const [selectedView, setSelectedView] = useState<'model' | number>('model');
 
   useEffect(() => {
     async function loadAsset() {
@@ -64,6 +78,207 @@ export default function GiftDetail() {
     loadAsset();
   }, []);
 
+  const handleDownload = async () => {
+    try {
+      const htmlContent = `
+        <!DOCTYPE html>
+        <html>
+        <head>
+          <meta name="viewport" content="width=device-width, initial-scale=1.0">
+          <style>
+            body {
+              font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+              padding: 40px;
+              background: #FFEDCF;
+              color: #2A2A2A;
+            }
+            .header {
+              text-align: center;
+              margin-bottom: 40px;
+            }
+            .title {
+              font-size: 32px;
+              font-style: italic;
+              margin-bottom: 20px;
+              color: #2A2A2A;
+            }
+            .metadata {
+              display: flex;
+              justify-content: center;
+              gap: 20px;
+              margin: 20px 0;
+              font-size: 12px;
+            }
+            .metadata-item {
+              text-align: center;
+            }
+            .metadata-label {
+              font-weight: bold;
+              margin-bottom: 4px;
+            }
+            .section {
+              background: white;
+              border-radius: 15px;
+              padding: 25px;
+              margin: 20px 0;
+            }
+            .section-title {
+              font-size: 20px;
+              font-weight: 600;
+              margin-bottom: 15px;
+              color: #2A2A2A;
+            }
+            .section-content {
+              font-size: 14px;
+              line-height: 1.6;
+              color: #4A4A4A;
+            }
+            .origin-details {
+              display: flex;
+              justify-content: space-around;
+              margin: 15px 0;
+              padding: 15px 0;
+              border-top: 1px solid #D4B895;
+              border-bottom: 1px solid #D4B895;
+            }
+            .origin-item {
+              text-align: center;
+              flex: 1;
+            }
+            .origin-label {
+              font-size: 11px;
+              color: #8C7B70;
+              margin-bottom: 6px;
+            }
+            .origin-value {
+              font-size: 13px;
+              color: #1A1A1A;
+              font-weight: 500;
+            }
+            .material-row {
+              display: flex;
+              justify-content: space-around;
+              margin-top: 15px;
+            }
+            .material-item {
+              text-align: center;
+            }
+            .material-label {
+              font-size: 12px;
+              color: #D08C5B;
+              margin-bottom: 8px;
+            }
+            .material-value {
+              font-size: 14px;
+              color: #2A2A2A;
+              font-weight: 600;
+            }
+            .technical-row {
+              display: flex;
+              justify-content: space-between;
+              padding: 12px 0;
+              border-bottom: 1px solid #E0E0E0;
+            }
+            .technical-label {
+              color: #888888;
+            }
+            .technical-value {
+              font-weight: 700;
+            }
+          </style>
+        </head>
+        <body>
+          <div class="header">
+            <div class="title">Handcrafted<br/>Elephant Statue</div>
+            <div class="metadata">
+              <div class="metadata-item">
+                <div class="metadata-label">Collection Number</div>
+                <div>UAE-IND-2018-04</div>
+              </div>
+              <div class="metadata-item">
+                <div class="metadata-label">Category</div>
+                <div>Sculpture</div>
+              </div>
+              <div class="metadata-item">
+                <div class="metadata-label">Gift Type</div>
+                <div>Received</div>
+              </div>
+            </div>
+            <p style="text-align: center; color: #5A5A5A; font-size: 14px; margin-top: 15px;">
+              A symbol of wisdom, strength, and prosperity, reflecting traditional craftsmanship and unity.
+            </p>
+          </div>
+
+          <div class="section">
+            <div class="section-title">Gift Origin</div>
+            <div class="origin-details">
+              <div class="origin-item">
+                <div class="origin-label">Source/Giver</div>
+                <div class="origin-value">Gifted by the Government of India</div>
+              </div>
+              <div class="origin-item">
+                <div class="origin-label">Date</div>
+                <div class="origin-value">Received: January 24, 2018</div>
+              </div>
+              <div class="origin-item">
+                <div class="origin-label">Location</div>
+                <div class="origin-value">Presidential Palace, Abu Dhabi</div>
+              </div>
+            </div>
+            <div class="section-content">
+              This statue was received from the Government of India during an official diplomatic visit in 2018, 
+              symbolizing the shared values of peace, cultural harmony, and respect between both nations.
+            </div>
+          </div>
+
+          <div class="section">
+            <div class="section-title">Gift Presentation</div>
+            <div class="section-content">
+              Formally presented during a state ceremony at the Presidential Palace, where leaders exchanged 
+              artifacts representing heritage.
+            </div>
+          </div>
+
+          <div class="section">
+            <div class="section-title">Material & Artistry</div>
+            <div class="material-row">
+              <div class="material-item">
+                <div class="material-label">Material</div>
+                <div class="material-value">White Marble</div>
+              </div>
+              <div class="material-item">
+                <div class="material-label">Finish</div>
+                <div class="material-value">24K Gold</div>
+              </div>
+            </div>
+          </div>
+
+          <div class="section">
+            <div class="section-title">Technical Essence</div>
+            <div class="technical-row">
+              <div class="technical-label">Dimensions</div>
+              <div class="technical-value">12"H x 15"W x 8"D</div>
+            </div>
+            <div class="technical-row">
+              <div class="technical-label">Weight</div>
+              <div class="technical-value">4.2 kg</div>
+            </div>
+            <div class="technical-row" style="border-bottom: none;">
+              <div class="technical-label">Authenticity</div>
+              <div class="technical-value">Signed Certificate</div>
+            </div>
+          </div>
+        </body>
+        </html>
+      `;
+
+      const { uri } = await Print.printToFileAsync({ html: htmlContent });
+      await Sharing.shareAsync(uri, { UTI: '.pdf', mimeType: 'application/pdf' });
+    } catch (error) {
+      console.error('Error generating PDF:', error);
+    }
+  };
+
   return (
     <SafeAreaView style={[styles.container, isDarkMode && { backgroundColor: 'transparent' }]}>
       <Stack.Screen options={{ headerShown: false }} />
@@ -73,11 +288,11 @@ export default function GiftDetail() {
           <View style={styles.loaderContainer}>
             <ActivityIndicator size="large" color="#C98B5E" />
           </View>
-          {assetLoaded && (
+          {assetLoaded && selectedView === 'model' && (
             <Canvas 
               camera={{ position: [0, 0, 5], fov: 50 }} 
               style={{ flex: 1 }}
-              frameloop="always" // Continuous rendering for slider interaction
+              frameloop="always"
             >
               <ambientLight intensity={7} />
               <directionalLight position={[5, 10, 5]} intensity={1.5} />
@@ -88,22 +303,70 @@ export default function GiftDetail() {
               </Suspense>
             </Canvas>
           )}
+          {selectedView !== 'model' && (
+            <Image
+              source={galleryImages[selectedView as number]}
+              style={styles.mainImage}
+              resizeMode="contain"
+            />
+          )}
         </View>
 
-        {/* Rotation Slider */}
-        <View style={styles.controlsSection}>
-          <Slider
-            style={styles.slider}
-            minimumValue={0}
-            maximumValue={Math.PI * 2}
-            value={rotation}
-            onValueChange={setRotation}
-            minimumTrackTintColor="#BCA488" 
-            maximumTrackTintColor="#BCA488" 
-            thumbTintColor="#C98B5E" 
-          />
-          <Text style={[styles.sliderText, isDarkMode && styles.textGrey]}>Slide to Rotate</Text>
+        {/* Thumbnail Gallery */}
+        <View style={styles.gallerySection}>
+          <ScrollView 
+            horizontal 
+            showsHorizontalScrollIndicator={false}
+            contentContainerStyle={styles.galleryContent}
+          >
+            {/* 3D Model Thumbnail */}
+            <TouchableOpacity 
+              style={[
+                styles.thumbnail,
+                selectedView === 'model' && styles.thumbnailSelected
+              ]}
+              onPress={() => setSelectedView('model')}
+              activeOpacity={0.7}
+            >
+              <View style={styles.thumbnailModel}>
+                <Ionicons name="cube-outline" size={32} color="#C98B5E" />
+                <Text style={styles.thumbnailModelText}>3D</Text>
+              </View>
+            </TouchableOpacity>
+
+            {/* Image Thumbnails */}
+            {galleryImages.map((img, index) => (
+              <TouchableOpacity
+                key={index}
+                style={[
+                  styles.thumbnail,
+                  selectedView === index && styles.thumbnailSelected
+                ]}
+                onPress={() => setSelectedView(index)}
+                activeOpacity={0.7}
+              >
+                <Image source={img} style={styles.thumbnailImage} resizeMode="cover" />
+              </TouchableOpacity>
+            ))}
+          </ScrollView>
         </View>
+
+        {/* Rotation Slider - Only show when 3D model is active */}
+        {selectedView === 'model' && (
+          <View style={styles.controlsSection}>
+            <Slider
+              style={styles.slider}
+              minimumValue={0}
+              maximumValue={Math.PI * 2}
+              value={rotation}
+              onValueChange={setRotation}
+              minimumTrackTintColor="#BCA488" 
+              maximumTrackTintColor="#BCA488" 
+              thumbTintColor="#C98B5E" 
+            />
+            <Text style={[styles.sliderText, isDarkMode && styles.textGrey]}>Slide to Rotate</Text>
+          </View>
+        )}
 
         {/* Title Section */}
         <View style={styles.titleSection}>
@@ -270,6 +533,18 @@ export default function GiftDetail() {
               <Text style={styles.technicalLabel}>Authenticity</Text>
               <Text style={[styles.technicalValue, isDarkMode && styles.textWhite]}>Signed Certificate</Text>
             </View>
+
+             <TouchableOpacity onPress={handleDownload} activeOpacity={0.8} style={{ width: '100%', marginTop: 30 }}>
+                <LinearGradient
+                  colors={isDarkMode ? ['#FFFCB4', '#CBA969'] : ['#2A2A2A', '#2A2A2A']}
+                  start={{ x: 0, y: 0 }}
+                  end={{ x: 0.9, y: 1 }} // Approximate 105 deg
+                  style={styles.downloadButton}
+                >
+                  <Text style={[styles.downloadButtonText, isDarkMode && { color: '#1A1A1A' }]}>Download PDF</Text>
+                  <Ionicons name="download-outline" size={24} color={isDarkMode ? "#1A1A1A" : "#FFFFFF"} />
+                </LinearGradient>
+            </TouchableOpacity>
           </View>
         </View>
       </ScrollView>
@@ -558,6 +833,52 @@ const styles = StyleSheet.create({
     backgroundColor: "#D4B895", // Muted gold
     alignSelf: "center",
   },
+  // Gallery Styles
+  mainImage: {
+    width: '100%',
+    height: '100%',
+  },
+  gallerySection: {
+    backgroundColor: '#2A2A2A',
+    paddingVertical: 15,
+    paddingHorizontal: 10,
+    marginBottom: 20,
+  },
+  galleryContent: {
+    paddingHorizontal: 10,
+    gap: 12,
+  },
+  thumbnail: {
+    width: 80,
+    height: 80,
+    borderRadius: 15,
+    overflow: 'hidden',
+    backgroundColor: '#3A3A3A',
+    marginRight: 12,
+    borderWidth: 3,
+    borderColor: 'transparent',
+  },
+  thumbnailSelected: {
+    borderColor: '#C98B5E',
+  },
+  thumbnailImage: {
+    width: '100%',
+    height: '100%',
+  },
+  thumbnailModel: {
+    width: '100%',
+    height: '100%',
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: '#3A3A3A',
+  },
+  thumbnailModelText: {
+    color: '#C98B5E',
+    fontSize: 10,
+    fontFamily: 'InstrumentSans',
+    fontWeight: '600',
+    marginTop: 4,
+  },
   // Dark Mode Styles
   textWhite: { color: '#FFF' },
   textGold: { color: '#CBA969' },
@@ -590,5 +911,19 @@ const styles = StyleSheet.create({
   goldDivider: {
     backgroundColor: '#CBA969',
   },
-  // Removed unused styles
+  downloadButton: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+    paddingVertical: 18,
+    borderRadius: 30,
+    gap: 10,
+    width: "100%",
+  },
+  downloadButtonText: {
+    fontFamily: "InstrumentSans",
+    fontSize: 16,
+    color: "#FFFFFF",
+    fontWeight: "500",
+  },
 });
