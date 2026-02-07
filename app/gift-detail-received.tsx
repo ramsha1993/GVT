@@ -48,11 +48,11 @@ function Model({ rotation }: { rotation: number }) {
   });
 
   return (
-    <primitive 
-      object={gltf.scene} 
-      ref={mesh} 
-      scale={[2.5, 2.5, 2.5]} 
-      position={[0, -1.0, 0]} 
+    <primitive
+      object={gltf.scene}
+      ref={mesh}
+      scale={[2.5, 2.5, 2.5]}
+      position={[0, -1.0, 0]}
     />
   );
 }
@@ -86,7 +86,8 @@ export default function GiftDetailReceived() {
   const [rotation, setRotation] = useState(0);
   const [assetLoaded, setAssetLoaded] = useState(false);
   const [selectedView, setSelectedView] = useState<'model' | number>('model');
-  
+  const [zoomLevel, setZoomLevel] = useState(1);
+
   const handleDownload = async () => {
     try {
       const htmlContent = `
@@ -233,7 +234,7 @@ export default function GiftDetailReceived() {
       console.error('Error generating PDF:', error);
     }
   };
-  
+
   // Accordion states
   const [openSection, setOpenSection] = useState<string | null>("Quantity");
 
@@ -256,7 +257,7 @@ export default function GiftDetailReceived() {
   return (
     <SafeAreaView style={[styles.container, isDarkMode && { backgroundColor: 'transparent' }]}>
       <Stack.Screen options={{ headerShown: false }} />
-      
+
       <ScrollView contentContainerStyle={styles.scrollContent}>
         {/* 3D Model Viewer */}
         <View style={[styles.modelContainer, isDarkMode && styles.darkModelContainer]}>
@@ -270,25 +271,54 @@ export default function GiftDetailReceived() {
               </Suspense>
             </Canvas>
           ) : selectedView !== 'model' ? (
-            <Image
-              source={galleryImages[selectedView as number]}
-              style={styles.mainImage}
-              resizeMode="contain"
-            />
+            <ScrollView
+              style={styles.imageScrollView}
+              contentContainerStyle={styles.imageScrollContent}
+              maximumZoomScale={3}
+              minimumZoomScale={1}
+              showsHorizontalScrollIndicator={false}
+              showsVerticalScrollIndicator={false}
+            >
+              <Image
+                source={galleryImages[selectedView as number]}
+                style={[styles.mainImage, { transform: [{ scale: zoomLevel }] }]}
+                resizeMode="contain"
+              />
+            </ScrollView>
           ) : (
             <ActivityIndicator size="large" color="#C98B5E" />
+          )}
+          
+          {/* Zoom Controls - Only show when viewing images */}
+          {selectedView !== 'model' && (
+            <View style={styles.zoomControls}>
+              <TouchableOpacity 
+                style={styles.zoomButton}
+                onPress={() => setZoomLevel(prev => Math.min(prev + 0.5, 3))}
+                activeOpacity={0.7}
+              >
+                <Ionicons name="add" size={24} color="#FFFFFF" />
+              </TouchableOpacity>
+              <TouchableOpacity 
+                style={styles.zoomButton}
+                onPress={() => setZoomLevel(prev => Math.max(prev - 0.5, 1))}
+                activeOpacity={0.7}
+              >
+                <Ionicons name="remove" size={24} color="#FFFFFF" />
+              </TouchableOpacity>
+            </View>
           )}
         </View>
 
         {/* Thumbnail Gallery */}
         <View style={styles.gallerySection}>
-          <ScrollView 
-            horizontal 
+          <ScrollView
+            horizontal
             showsHorizontalScrollIndicator={false}
             contentContainerStyle={styles.galleryContent}
           >
             {/* 3D Model Thumbnail */}
-            <TouchableOpacity 
+            <TouchableOpacity
               style={[
                 styles.thumbnail,
                 selectedView === 'model' && styles.thumbnailSelected
@@ -340,7 +370,7 @@ export default function GiftDetailReceived() {
         <View style={styles.titleSection}>
           <Text style={[styles.titleItalic, isDarkMode && styles.textWhite]}>Handcrafted</Text>
           <Text style={[styles.titleRegular, isDarkMode && styles.textWhite]}>Peacock Statue</Text>
-          
+
           <View style={styles.metadataRow}>
             <View style={styles.metadataItem}>
               <Text style={[styles.metadataLabel, isDarkMode && styles.textGold]}>Collection Number</Text>
@@ -365,7 +395,7 @@ export default function GiftDetailReceived() {
 
         {/* Accordions */}
         <View style={styles.accordionSection}>
-           <TouchableOpacity onPress={handleDownload} activeOpacity={0.8} style={{ marginBottom: 20 }}>
+          <TouchableOpacity onPress={handleDownload} activeOpacity={0.8} style={{ marginBottom: 20 }}>
             <LinearGradient
               colors={isDarkMode ? ['#FFF8D5', '#CBA969'] : ['#2A2A2A', '#2A2A2A']}
               start={{ x: 0, y: 0 }}
@@ -377,50 +407,93 @@ export default function GiftDetailReceived() {
             </LinearGradient>
           </TouchableOpacity>
 
-           {/* Wrapping map could be better but sticking to manual items for now */}
-           <View style={[styles.accordionContainer, isDarkMode && styles.darkAccordion]}>
-             <TouchableOpacity style={styles.accordionHeader} onPress={() => toggleSection("Quantity")}>
-                <Text style={[styles.accordionTitle, isDarkMode && styles.textWhite]}>Quantity</Text>
-                <Ionicons name={openSection === "Quantity" ? "chevron-up" : "chevron-down"} size={20} color={isDarkMode ? "#CBA969" : "#5A5A5A"} />
-             </TouchableOpacity>
-             {openSection === "Quantity" && (
-                <View style={styles.accordionContent}>
-                    <Text style={[styles.accordionValue, isDarkMode && styles.textWhite]}>100 Pcs</Text>
-                </View>
-             )}
-           </View>
-           {/* Country */}
-           <View style={[styles.accordionContainer, isDarkMode && styles.darkAccordion, { marginTop: 10 }]}>
-             <TouchableOpacity style={styles.accordionHeader} onPress={() => toggleSection("Country")}>
-                <Text style={[styles.accordionTitle, isDarkMode && styles.textWhite]}>Country</Text>
-                <Ionicons name={openSection === "Country" ? "chevron-up" : "chevron-down"} size={20} color={isDarkMode ? "#CBA969" : "#5A5A5A"} />
-             </TouchableOpacity>
-             {openSection === "Country" && (
-                <View style={styles.accordionContent}>
-                    <Text style={[styles.accordionValue, isDarkMode && styles.textWhite]}>India</Text>
-                </View>
-             )}
-           </View>
-           {/* Simplified for brevity (applying same pattern to others implicitly via generic 'accordionSection' children loop if I could, but here manually replacing layout). Staying safe: I'll just conditionally style the container and text in style defs if possible? No, 'accordionContainer' is used inside a component. I should update the AccordionItem component logic or pass props. */}
+          {/* Wrapping map could be better but sticking to manual items for now */}
+          <View style={[styles.accordionContainer, isDarkMode && styles.darkAccordion]}>
+            <TouchableOpacity style={styles.accordionHeader} onPress={() => toggleSection("Quantity")}>
+              <Text style={[styles.accordionTitle, isDarkMode && styles.textWhite]}>Quantity</Text>
+              <Ionicons name={openSection === "Quantity" ? "chevron-up" : "chevron-down"} size={20} color={isDarkMode ? "#CBA969" : "#5A5A5A"} />
+            </TouchableOpacity>
+            {openSection === "Quantity" && (
+              <View style={styles.accordionContent}>
+                <Text style={[styles.accordionValue, isDarkMode && styles.textWhite]}>100 Pcs</Text>
+              </View>
+            )}
+          </View>
+          {/* Country Of Origin */}
+          <View style={[styles.accordionContainer, isDarkMode && styles.darkAccordion, { marginTop: 10 }]}>
+            <TouchableOpacity style={styles.accordionHeader} onPress={() => toggleSection("Country")}>
+              <Text style={[styles.accordionTitle, isDarkMode && styles.textWhite]}>Country Of Origin</Text>
+              <Ionicons name={openSection === "Country" ? "chevron-up" : "chevron-down"} size={20} color={isDarkMode ? "#CBA969" : "#5A5A5A"} />
+            </TouchableOpacity>
+            {openSection === "Country" && (
+              <View style={styles.accordionContent}>
+                <Text style={[styles.accordionValue, isDarkMode && styles.textWhite]}>India</Text>
+              </View>
+            )}
+          </View>
+
+          {/* Date */}
+          <View style={[styles.accordionContainer, isDarkMode && styles.darkAccordion, { marginTop: 10 }]}>
+            <TouchableOpacity style={styles.accordionHeader} onPress={() => toggleSection("Date")}>
+              <Text style={[styles.accordionTitle, isDarkMode && styles.textWhite]}>Date</Text>
+              <Ionicons name={openSection === "Date" ? "chevron-up" : "chevron-down"} size={20} color={isDarkMode ? "#CBA969" : "#5A5A5A"} />
+            </TouchableOpacity>
+            {openSection === "Date" && (
+              <View style={styles.accordionContent}>
+                <Text style={[styles.accordionValue, isDarkMode && styles.textWhite]}>January 24, 2018</Text>
+              </View>
+            )}
+          </View>
+
+          {/* Location */}
+          <View style={[styles.accordionContainer, isDarkMode && styles.darkAccordion, { marginTop: 10 }]}>
+            <TouchableOpacity style={styles.accordionHeader} onPress={() => toggleSection("Location")}>
+              <Text style={[styles.accordionTitle, isDarkMode && styles.textWhite]}>Location</Text>
+              <Ionicons name={openSection === "Location" ? "chevron-up" : "chevron-down"} size={20} color={isDarkMode ? "#CBA969" : "#5A5A5A"} />
+            </TouchableOpacity>
+            {openSection === "Location" && (
+              <View style={styles.accordionContent}>
+                <Text style={[styles.accordionValue, isDarkMode && styles.textWhite]}>Presidential Palace, Abu Dhabi</Text>
+              </View>
+            )}
+          </View>
+
+          {/* Material */}
+          <View style={[styles.accordionContainer, isDarkMode && styles.darkAccordion, { marginTop: 10 }]}>
+            <TouchableOpacity style={styles.accordionHeader} onPress={() => toggleSection("Material")}>
+              <Text style={[styles.accordionTitle, isDarkMode && styles.textWhite]}>Material</Text>
+              <Ionicons name={openSection === "Material" ? "chevron-up" : "chevron-down"} size={20} color={isDarkMode ? "#CBA969" : "#5A5A5A"} />
+            </TouchableOpacity>
+            {openSection === "Material" && (
+              <View style={styles.accordionContent}>
+                <Text style={[styles.accordionValue, isDarkMode && styles.textWhite]}>White Marble with 24K Gold Finish</Text>
+              </View>
+            )}
+          </View>
         </View>
 
         {/* Quote Box */}
         <LinearGradient
-          colors={['#000000', '#121212']}
+          colors={
+            isDarkMode
+              ? ['rgba(0,0,0,0.5)', 'rgba(18,18,18,0.5)']
+              : ['rgba(208,140,91,0.5)', 'rgba(208,140,91,0.25)']
+          }
           style={styles.quoteBox}
           start={{ x: 0, y: 0 }}
           end={{ x: 0, y: 1 }}
         >
-          <Image 
-            source={require("../assets/icons/quote.png")} 
-            style={styles.quoteIcon} 
+
+          <Image
+            source={require("../assets/icons/quote.png")}
+            style={styles.quoteIcon}
             resizeMode="contain"
           />
-          
+
           <Text style={[styles.quoteText, isDarkMode && styles.textWhite]}>
             This piece represents more than a gift; it's a bridge between souls and histories.
           </Text>
-          
+
           <View style={styles.authorSection}>
             <Text style={[styles.authorName, isDarkMode && styles.textWhite]}>John Do</Text>
             <Text style={[styles.authorTitle, isDarkMode && styles.textGrey]}>Master Artisan, Sri Lanka</Text>
@@ -430,17 +503,17 @@ export default function GiftDetailReceived() {
         {/* Technical Essence */}
         <View style={[styles.technicalSection, isDarkMode && styles.darkTechnicalSection]}>
           <Text style={[styles.technicalTitle, isDarkMode && styles.textGold]}>Technical Essence</Text>
-          
+
           <View style={styles.technicalRow}>
             <Text style={styles.technicalLabel}>Dimensions</Text>
             <Text style={[styles.technicalValue, isDarkMode && styles.textWhite]}>12" H x 15" W x 8" D</Text>
           </View>
-          
+
           <View style={styles.technicalRow}>
             <Text style={styles.technicalLabel}>Weight</Text>
             <Text style={[styles.technicalValue, isDarkMode && styles.textWhite]}>4.2 kg</Text>
           </View>
-          
+
           <View style={[styles.technicalRow, { borderBottomWidth: 0 }]}>
             <Text style={styles.technicalLabel}>Authenticity</Text>
             <Text style={[styles.technicalValue, isDarkMode && styles.textWhite]}>Signed Certificate</Text>
@@ -448,12 +521,12 @@ export default function GiftDetailReceived() {
         </View>
 
       </ScrollView>
-       {isDarkMode && (
+      {isDarkMode && (
         <LinearGradient
-            colors={['#3E392C', '#08090C']}
-            style={[StyleSheet.absoluteFillObject, { zIndex: -2 }]}
-            start={{ x: 0.2, y: 0 }}
-            end={{ x: 0.8, y: 1 }}
+          colors={['#3E392C', '#08090C']}
+          style={[StyleSheet.absoluteFillObject, { zIndex: -2 }]}
+          start={{ x: 0.2, y: 0 }}
+          end={{ x: 0.8, y: 1 }}
         />
       )}
     </SafeAreaView>
@@ -623,7 +696,7 @@ const styles = StyleSheet.create({
     width: 100,
     height: 100,
     opacity: 0.4,
-    tintColor: "#FFFFFF" 
+    tintColor: "#FFFFFF"
   },
   quoteText: {
     fontFamily: "InstrumentSans",
@@ -758,5 +831,36 @@ const styles = StyleSheet.create({
     fontFamily: 'InstrumentSans',
     fontWeight: '600',
     marginTop: 4,
+  },
+  zoomControls: {
+    position: 'absolute',
+    bottom: 20,
+    left: '50%',
+    transform: [{ translateX: -60 }],
+    flexDirection: 'row',
+    gap: 15,
+    zIndex: 10,
+  },
+  zoomButton: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    backgroundColor: '#2A2A2A',
+    justifyContent: 'center',
+    alignItems: 'center',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.3,
+    shadowRadius: 4,
+    elevation: 5,
+  },
+  imageScrollView: {
+    flex: 1,
+    width: '100%',
+  },
+  imageScrollContent: {
+    flexGrow: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
   },
 });

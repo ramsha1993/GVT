@@ -41,6 +41,46 @@ export default function Home() {
           end={{ x: 1, y: 1 }}
           style={[styles.giftCard, { borderWidth: 0 }]}
         >
+          <Image
+            source={require("../assets/images/giftimg1.png")}
+            style={[styles.giftImage, { borderRadius: 20 }]}
+            resizeMode="contain"
+          />
+          <Text style={styles.giftTitle}>Handcrafted Peacock Statue</Text>
+ 
+          <TouchableOpacity
+            style={styles.learnMoreButton}
+            onPress={() => router.push("/gift-detail-received")}
+          >
+            <Text style={styles.learnMoreText}>Learn More</Text>
+          </TouchableOpacity>
+        </LinearGradient>
+      ) : (
+        <View style={styles.giftCard}>
+          <Image
+            source={require("../assets/images/giftimg1.png")}
+            style={styles.giftImage}
+            resizeMode="contain"
+          />
+          <Text style={styles.giftTitle}>Handcrafted Peacock Statue</Text>
+ 
+          <TouchableOpacity
+            style={styles.learnMoreButton}
+            onPress={() => router.push("/gift-detail-received")}
+          >
+            <Text style={styles.learnMoreText}>Learn More</Text>
+          </TouchableOpacity>
+        </View>
+      );
+    } else {
+      // Received: Peacock
+      return isDarkMode ? (
+        <LinearGradient
+          colors={['#FFFCB4', '#CBA969']}
+          start={{ x: 0, y: 0 }}
+          end={{ x: 1, y: 1 }}
+          style={[styles.giftCard, { borderWidth: 0 }]}
+        >
             <Image
             source={require("../assets/images/giftimg2.png")}
             style={[styles.giftImage, { borderRadius: 20 }]}
@@ -76,46 +116,6 @@ export default function Home() {
           </TouchableOpacity>
         </View>
       );
-    } else {
-      // Received: Peacock
-      return isDarkMode ? (
-        <LinearGradient
-          colors={['#FFFCB4', '#CBA969']}
-          start={{ x: 0, y: 0 }}
-          end={{ x: 1, y: 1 }}
-          style={[styles.giftCard, { borderWidth: 0 }]}
-        >
-          <Image
-            source={require("../assets/images/giftimg1.png")}
-            style={[styles.giftImage, { borderRadius: 20 }]}
-            resizeMode="contain"
-          />
-          <Text style={styles.giftTitle}>Handcrafted Peacock Statue</Text>
- 
-          <TouchableOpacity
-            style={styles.learnMoreButton}
-            onPress={() => router.push("/gift-detail-received")}
-          >
-            <Text style={styles.learnMoreText}>Learn More</Text>
-          </TouchableOpacity>
-        </LinearGradient>
-      ) : (
-        <View style={styles.giftCard}>
-          <Image
-            source={require("../assets/images/giftimg1.png")}
-            style={styles.giftImage}
-            resizeMode="contain"
-          />
-          <Text style={styles.giftTitle}>Handcrafted Peacock Statue</Text>
- 
-          <TouchableOpacity
-            style={styles.learnMoreButton}
-            onPress={() => router.push("/gift-detail-received")}
-          >
-            <Text style={styles.learnMoreText}>Learn More</Text>
-          </TouchableOpacity>
-        </View>
-      );
     }
   };
 
@@ -126,7 +126,11 @@ export default function Home() {
       {/* Header with Filter Icon */}
       <View style={styles.header}>
         <TouchableOpacity onPress={() => setFilterVisible(true)} style={styles.filterButton}>
-          <Ionicons name="options-outline" size={28} color={isDarkMode ? "#CBA969" : "#1A1A1A"} />
+          <Image 
+            source={isDarkMode ? require('../assets/icons/filter.png') : require('../assets/icons/filter_l.png')}
+            style={{ width: 28, height: 28 }}
+            resizeMode="contain"
+          />
         </TouchableOpacity>
       </View>
 

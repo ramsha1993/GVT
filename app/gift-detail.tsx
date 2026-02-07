@@ -9,15 +9,15 @@ import { Stack } from "expo-router";
 import * as Sharing from 'expo-sharing';
 import { Suspense, useEffect, useRef, useState } from "react";
 import {
-  ActivityIndicator,
-  Dimensions,
-  Image,
-  SafeAreaView,
-  ScrollView,
-  StyleSheet,
-  Text,
-  TouchableOpacity,
-  View,
+    ActivityIndicator,
+    Dimensions,
+    Image,
+    SafeAreaView,
+    ScrollView,
+    StyleSheet,
+    Text,
+    TouchableOpacity,
+    View,
 } from "react-native";
 import * as THREE from "three";
 import "../polyfills";
@@ -65,6 +65,7 @@ export default function GiftDetail() {
   const [rotation, setRotation] = useState(0);
   const [assetLoaded, setAssetLoaded] = useState(false);
   const [selectedView, setSelectedView] = useState<'model' | number>('model');
+  const [zoomLevel, setZoomLevel] = useState(1);
 
   useEffect(() => {
     async function loadAsset() {
@@ -304,11 +305,40 @@ export default function GiftDetail() {
             </Canvas>
           )}
           {selectedView !== 'model' && (
-            <Image
-              source={galleryImages[selectedView as number]}
-              style={styles.mainImage}
-              resizeMode="contain"
-            />
+            <ScrollView
+              style={styles.imageScrollView}
+              contentContainerStyle={styles.imageScrollContent}
+              maximumZoomScale={3}
+              minimumZoomScale={1}
+              showsHorizontalScrollIndicator={false}
+              showsVerticalScrollIndicator={false}
+            >
+              <Image
+                source={galleryImages[selectedView as number]}
+                style={[styles.mainImage, { transform: [{ scale: zoomLevel }] }]}
+                resizeMode="contain"
+              />
+            </ScrollView>
+          )}
+          
+          {/* Zoom Controls - Only show when viewing images */}
+          {selectedView !== 'model' && (
+            <View style={styles.zoomControls}>
+              <TouchableOpacity 
+                style={styles.zoomButton}
+                onPress={() => setZoomLevel(prev => Math.min(prev + 0.5, 3))}
+                activeOpacity={0.7}
+              >
+                <Ionicons name="add" size={24} color="#FFFFFF" />
+              </TouchableOpacity>
+              <TouchableOpacity 
+                style={styles.zoomButton}
+                onPress={() => setZoomLevel(prev => Math.max(prev - 0.5, 1))}
+                activeOpacity={0.7}
+              >
+                <Ionicons name="remove" size={24} color="#FFFFFF" />
+              </TouchableOpacity>
+            </View>
           )}
         </View>
 
@@ -878,6 +908,37 @@ const styles = StyleSheet.create({
     fontFamily: 'InstrumentSans',
     fontWeight: '600',
     marginTop: 4,
+  },
+  zoomControls: {
+    position: 'absolute',
+    bottom: 20,
+    left: '50%',
+    transform: [{ translateX: -60 }],
+    flexDirection: 'row',
+    gap: 15,
+    zIndex: 10,
+  },
+  zoomButton: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    backgroundColor: '#2A2A2A',
+    justifyContent: 'center',
+    alignItems: 'center',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.3,
+    shadowRadius: 4,
+    elevation: 5,
+  },
+  imageScrollView: {
+    flex: 1,
+    width: '100%',
+  },
+  imageScrollContent: {
+    flexGrow: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
   },
   // Dark Mode Styles
   textWhite: { color: '#FFF' },

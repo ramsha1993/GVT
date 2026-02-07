@@ -58,27 +58,32 @@ export default function GiftSelection() {
           <View style={[styles.card, isDarkMode && styles.darkCard]}>
             {isDarkMode && <View style={styles.cardGoldBorder} />}
             <Image
-              source={require("../assets/icons/send.png")}
-              style={[styles.icon, isDarkMode && { tintColor: '#CBA969' }]}
+              source={
+                isDarkMode
+                  ? require("../assets/icons/gfs_d.png")
+                  : require("../assets/icons/send.png")
+              }
+              style={styles.icon}
               resizeMode="contain"
             />
-            <Text style={[styles.cardTitle, isDarkMode && styles.textWhite]}>Gift Send</Text>
-            
+
+            <Text style={[styles.cardTitle, isDarkMode && styles.textWhite]}>Gift Sent</Text>
+
             {isDarkMode ? (
-                <LinearGradient
-                  colors={['#FFFCB4', '#CBA969']}
-                  style={styles.continueButton}
-                  start={{ x: 0, y: 0 }}
-                  end={{ x: 1, y: 0 }}
-                >
-                    <Pressable onPress={handleGiftSend} style={{ width: '100%', alignItems: 'center' }}>
-                        <Text style={[styles.continueButtonText, { color: '#1A1A1A' }]}>Check-Out</Text>
-                    </Pressable>
-                </LinearGradient>
-            ) : (
-                <Pressable style={styles.continueButton} onPress={handleGiftSend}>
-                    <Text style={styles.continueButtonText}>Continue</Text>
+              <LinearGradient
+                colors={['#FFFCB4', '#CBA969']}
+                style={styles.continueButton}
+                start={{ x: 0, y: 0 }}
+                end={{ x: 1, y: 0 }}
+              >
+                <Pressable onPress={handleGiftSend} style={{ width: '100%', alignItems: 'center' }}>
+                  <Text style={[styles.continueButtonText, { color: '#1A1A1A' }]}>Explore</Text>
                 </Pressable>
+              </LinearGradient>
+            ) : (
+              <Pressable style={styles.continueButton} onPress={handleGiftSend}>
+                <Text style={styles.continueButtonText}>Explore</Text>
+              </Pressable>
             )}
           </View>
         </View>
@@ -88,26 +93,30 @@ export default function GiftSelection() {
           <View style={[styles.card, isDarkMode && styles.darkCard]}>
             {isDarkMode && <View style={styles.cardGoldBorder} />}
             <Image
-              source={require("../assets/icons/reciever_l.png")}
-              style={[styles.icon, isDarkMode && { tintColor: '#CBA969' }]}
+              source={
+                isDarkMode
+                  ? require("../assets/icons/gfs_d.png")
+                  : require("../assets/icons/reciever_l.png")
+              }
+              style={styles.icon}
               resizeMode="contain"
             />
             <Text style={[styles.cardTitle, isDarkMode && styles.textWhite]}>Gift Received</Text>
             {isDarkMode ? (
-                <LinearGradient
-                  colors={['#FFFCB4', '#CBA969']}
-                  style={styles.continueButton}
-                  start={{ x: 0, y: 0 }}
-                  end={{ x: 1, y: 0 }}
-                >
-                    <Pressable onPress={handleGiftReceived} style={{ width: '100%', alignItems: 'center' }}>
-                         <Text style={[styles.continueButtonText, { color: '#1A1A1A' }]}>Check-Out</Text>
-                    </Pressable>
-                </LinearGradient>
-            ) : (
-                <Pressable style={styles.continueButton} onPress={handleGiftReceived}>
-                    <Text style={styles.continueButtonText}>Continue</Text>
+              <LinearGradient
+                colors={['#FFFCB4', '#CBA969']}
+                style={styles.continueButton}
+                start={{ x: 0, y: 0 }}
+                end={{ x: 1, y: 0 }}
+              >
+                <Pressable onPress={handleGiftReceived} style={{ width: '100%', alignItems: 'center' }}>
+                  <Text style={[styles.continueButtonText, { color: '#1A1A1A' }]}>Explore</Text>
                 </Pressable>
+              </LinearGradient>
+            ) : (
+              <Pressable style={styles.continueButton} onPress={handleGiftReceived}>
+                <Text style={styles.continueButtonText}>Explore</Text>
+              </Pressable>
             )}
           </View>
         </View>
@@ -120,12 +129,12 @@ export default function GiftSelection() {
       <Stack.Screen options={{ headerShown: false }} />
       {isDarkMode ? (
         <LinearGradient
-            colors={['#3E392C', '#08090C']}
-            style={{ flex: 1 }}
-            start={{ x: 0.2, y: 0 }}
-            end={{ x: 0.8, y: 1 }}
+          colors={['#3E392C', '#08090C']}
+          style={{ flex: 1 }}
+          start={{ x: 0.2, y: 0 }}
+          end={{ x: 0.8, y: 1 }}
         >
-            {content}
+          {content}
         </LinearGradient>
       ) : (
         content
