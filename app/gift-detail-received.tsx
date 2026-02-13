@@ -12,6 +12,7 @@ import {
   ActivityIndicator,
   Dimensions,
   Image,
+  PanResponder,
   SafeAreaView,
   ScrollView,
   StyleSheet,
@@ -36,14 +37,18 @@ const galleryImages = [
 // Reusing the elephant model as placeholder since peacock model wasn't found
 const modelAsset = Asset.fromModule(require("../assets/3dmodel/elephant_3d.glb"));
 
-function Model({ rotation }: { rotation: number }) {
+function Model({ rotationY, rotationX, zoomLevel }: { rotationY: number; rotationX: number; zoomLevel: number }) {
   // @ts-ignore
   const gltf = useGLTF(modelAsset.uri || modelAsset.localUri || require("../assets/3dmodel/elephant_3d.glb")) as any;
   const mesh = useRef<THREE.Group>(null);
 
   useFrame(() => {
     if (mesh.current) {
-      mesh.current.rotation.y = rotation;
+      mesh.current.rotation.y = rotationY;
+      mesh.current.rotation.x = rotationX;
+      // Apply zoom level by adjusting scale
+      const scale = 2.5 * zoomLevel;
+      mesh.current.scale.set(scale, scale, scale);
     }
   });
 
@@ -83,10 +88,87 @@ const AccordionItem = ({ title, value, isOpen, onPress }: { title: string, value
 export default function GiftDetailReceived() {
   const router = useRouter();
   const { isDarkMode } = useTheme();
-  const [rotation, setRotation] = useState(0);
+  const [rotationY, setRotationY] = useState(0);
+  const [rotationX, setRotationX] = useState(0);
   const [assetLoaded, setAssetLoaded] = useState(false);
   const [selectedView, setSelectedView] = useState<'model' | number>('model');
   const [zoomLevel, setZoomLevel] = useState(1);
+  
+  // Gesture refs for smoother performance
+  const lastTouchX = useRef(0);
+  const lastTouchY = useRef(0);
+  const lastPinchDistance = useRef(0);
+  const touchCount = useRef(0);
+  
+  const panResponder = useRef(
+    PanResponder.create({
+      onStartShouldSetPanResponder: () => true,
+      onMoveShouldSetPanResponder: () => true,
+      onPanResponderGrant: (evt) => {
+        const touches = evt.nativeEvent.touches;
+        touchCount.current = touches.length;
+        
+        if (touches.length >= 1) {
+          lastTouchX.current = touches[0].pageX;
+          lastTouchY.current = touches[0].pageY;
+        }
+        if (touches.length >= 2) {
+          const dx = touches[1].pageX - touches[0].pageX;
+          const dy = touches[1].pageY - touches[0].pageY;
+          lastPinchDistance.current = Math.sqrt(dx * dx + dy * dy);
+        }
+      },
+      onPanResponderMove: (evt) => {
+        const touches = evt.nativeEvent.touches;
+        
+        // Detect when finger count changes (e.g., second finger added)
+        if (touches.length !== touchCount.current) {
+          touchCount.current = touches.length;
+          if (touches.length >= 2) {
+            const dx = touches[1].pageX - touches[0].pageX;
+            const dy = touches[1].pageY - touches[0].pageY;
+            lastPinchDistance.current = Math.sqrt(dx * dx + dy * dy);
+          }
+          if (touches.length >= 1) {
+            lastTouchX.current = touches[0].pageX;
+            lastTouchY.current = touches[0].pageY;
+          }
+          return;
+        }
+        
+        if (touches.length === 1) {
+          // Single finger rotation
+          const deltaX = touches[0].pageX - lastTouchX.current;
+          const deltaY = touches[0].pageY - lastTouchY.current;
+          
+          setRotationY(prev => prev + deltaX * 0.008);
+          setRotationX(prev => Math.max(-1.2, Math.min(1.2, prev + deltaY * 0.008)));
+          
+          lastTouchX.current = touches[0].pageX;
+          lastTouchY.current = touches[0].pageY;
+        } else if (touches.length >= 2) {
+          // Pinch to zoom - use incremental scaling for smoother feel
+          const dx = touches[1].pageX - touches[0].pageX;
+          const dy = touches[1].pageY - touches[0].pageY;
+          const currentDistance = Math.sqrt(dx * dx + dy * dy);
+          
+          if (lastPinchDistance.current > 0) {
+            const pinchDelta = (currentDistance - lastPinchDistance.current) * 0.01;
+            setZoomLevel(prev => Math.max(0.5, Math.min(2.5, prev + pinchDelta)));
+          }
+          lastPinchDistance.current = currentDistance;
+        }
+      },
+      onPanResponderRelease: () => {
+        lastPinchDistance.current = 0;
+        touchCount.current = 0;
+      },
+      onPanResponderTerminate: () => {
+        lastPinchDistance.current = 0;
+        touchCount.current = 0;
+      },
+    })
+  ).current;
 
   const handleDownload = async () => {
     try {
@@ -262,14 +344,16 @@ export default function GiftDetailReceived() {
         {/* 3D Model Viewer */}
         <View style={[styles.modelContainer, isDarkMode && styles.darkModelContainer]}>
           {assetLoaded && selectedView === 'model' ? (
-            <Canvas camera={{ position: [0, 0, 5], fov: 50 }} style={{ flex: 1 }}>
-              <ambientLight intensity={7} />
-              <directionalLight position={[10, 10, 5]} intensity={2} />
-              <directionalLight position={[-10, 10, 5]} intensity={2} />
-              <Suspense fallback={null}>
-                <Model rotation={rotation} />
-              </Suspense>
-            </Canvas>
+            <View style={{ flex: 1 }} {...panResponder.panHandlers}>
+              <Canvas camera={{ position: [0, 0, 5], fov: 50 }} style={{ flex: 1 }}>
+                <ambientLight intensity={7} />
+                <directionalLight position={[10, 10, 5]} intensity={2} />
+                <directionalLight position={[-10, 10, 5]} intensity={2} />
+                <Suspense fallback={null}>
+                  <Model rotationY={rotationY} rotationX={rotationX} zoomLevel={zoomLevel} />
+                </Suspense>
+              </Canvas>
+            </View>
           ) : selectedView !== 'model' ? (
             <ScrollView
               style={styles.imageScrollView}
@@ -306,6 +390,15 @@ export default function GiftDetailReceived() {
               >
                 <Ionicons name="remove" size={24} color="#FFFFFF" />
               </TouchableOpacity>
+            </View>
+          )}
+          
+          {/* Gesture Instructions Overlay - Only for 3D model */}
+          {selectedView === 'model' && (
+            <View style={styles.gestureInstructions}>
+              <Text style={styles.gestureText}>
+                👆 Drag to rotate • 🤏 Pinch to zoom
+              </Text>
             </View>
           )}
         </View>
@@ -356,8 +449,8 @@ export default function GiftDetailReceived() {
               style={styles.slider}
               minimumValue={0}
               maximumValue={Math.PI * 2}
-              value={rotation}
-              onValueChange={setRotation}
+              value={rotationY}
+              onValueChange={setRotationY}
               minimumTrackTintColor="#C98B5E"
               maximumTrackTintColor="#D0C4A8"
               thumbTintColor="#C98B5E"
@@ -575,6 +668,7 @@ const styles = StyleSheet.create({
     borderBottomRightRadius: 50,
     marginBottom: 20,
     paddingTop: 40,
+    position: 'relative',
   },
   controlsSection: {
     alignItems: "center",
@@ -862,5 +956,23 @@ const styles = StyleSheet.create({
     flexGrow: 1,
     justifyContent: 'center',
     alignItems: 'center',
+  },
+  // Gesture Instructions
+  gestureInstructions: {
+    position: 'absolute',
+    top: 20,
+    left: 0,
+    right: 0,
+    alignItems: 'center',
+    zIndex: 10,
+  },
+  gestureText: {
+    backgroundColor: 'rgba(0, 0, 0, 0.6)',
+    color: 'white',
+    paddingHorizontal: 15,
+    paddingVertical: 8,
+    borderRadius: 20,
+    fontSize: 12,
+    fontFamily: 'InstrumentSans',
   },
 });
