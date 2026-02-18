@@ -18,14 +18,16 @@
         "backgroundImage": "./assets/images/logo.png",
         "monochromeImage": "./assets/images/logo.png"
       },
-      "package": "com.ahmedabid.gvt",
+      "package": "com.ramsha.gvt",
       "edgeToEdgeEnabled": true,
       "predictiveBackGestureEnabled": false
     },
     "web": {
       "output": "static"
     },
-    "plugins": ["expo-router"],
+    "plugins": [
+      "expo-router"
+    ],
     "experiments": {
       "typedRoutes": true,
       "reactCompiler": true
@@ -33,9 +35,9 @@
     "extra": {
       "router": {},
       "eas": {
-        "projectId": "1f44014e-c9d1-4fb8-a8f1-50131f359647"
+        "projectId": "d22f5063-7dfe-498e-8047-2db3f690ee7d"
       }
     },
-    "owner": "ahmed0029292"
+    "owner": "ramsha0089"
   }
 }
